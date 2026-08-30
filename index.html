@@ -17,6 +17,25 @@
 
 <body>
 
+    <div class="login-screen" id="loginScreen">
+        <div class="login-card">
+            <img src="icons/logo-icon.png" alt="Logo" class="login-logo">
+            <h1>Mapa Inteligente</h1>
+            <p class="login-sub">Acesso restrito à coordenação</p>
+            <label>Usuário
+                <input type="text" id="loginUser" autocomplete="username">
+            </label>
+            <label>Senha
+                <input type="password" id="loginPass" autocomplete="current-password"
+                    onkeydown="if(event.key==='Enter') tryLogin()">
+            </label>
+            <div class="login-error" id="loginError" style="display:none;">Usuário ou senha incorretos.</div>
+            <button class="btn-primary login-btn" onclick="tryLogin()">Entrar</button>
+        </div>
+    </div>
+    
+    <div id="appRoot" style="display:none;">
+
     <div class="topbar">
         <div class="topbar-brand">
             <div class="topbar-logo"><img src="icons/logo-icon.png" alt="Logo EFG"
@@ -369,6 +388,7 @@
                 <button class="btn-ghost"
                     onclick="clearCustomMap(); document.getElementById('saveStatus').textContent='';">Apagar meu mapa
                     salvo</button>
+                <button class="btn-ghost" onclick="logout()" style="margin-left:8px;">Sair da conta</button>
             </div>
 
             <div class="settings-section">
@@ -413,7 +433,7 @@
         <button class="nav-btn" data-screen="settings" onclick="showScreen('settings')"><span
                 class="ic">⚙️</span>Config</button>
     </nav>
-
+    </div>
     <script src="js/script.js"></script>
 </body>
 

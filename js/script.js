@@ -1,3 +1,51 @@
+/* ================= LOGIN (por escola) ================= */
+// Cada linha = uma coordenação/escola diferente com login próprio.
+// Pra cadastrar outra EFG, só copia uma linha e muda os valores.
+const ADMINS = [
+  { user: "coord.sarahluisa", pass: "efg2026", schoolId: "efg-sarah-luisa", schoolName: "EFG Sarah Luisa Lemos Kunirtschek de Oliveira" },
+];
+
+let currentAdmin = null;
+
+function tryLogin(){
+  const user = document.getElementById("loginUser").value.trim();
+  const pass = document.getElementById("loginPass").value;
+  const found = ADMINS.find(a => a.user === user && a.pass === pass);
+  const errorEl = document.getElementById("loginError");
+  if(!found){
+    errorEl.style.display = "block";
+    return;
+  }
+  errorEl.style.display = "none";
+  currentAdmin = found;
+  localStorage.setItem("logged-in-user", found.user);
+  enterApp();
+}
+
+function enterApp(){
+  document.getElementById("loginScreen").style.display = "none";
+  document.getElementById("appRoot").style.display = "block";
+  document.querySelector(".topbar-name small").textContent = currentAdmin.schoolName;
+  loadCustomMap(); // agora que sabemos quem logou, carrega o mapa certo
+}
+
+function logout(){
+  localStorage.removeItem("logged-in-user");
+  currentAdmin = null;
+  document.getElementById("appRoot").style.display = "none";
+  document.getElementById("loginScreen").style.display = "flex";
+  document.getElementById("loginUser").value = "";
+  document.getElementById("loginPass").value = "";
+}
+
+function checkSession(){
+  const savedUser = localStorage.getItem("logged-in-user");
+  if(savedUser){
+    const found = ADMINS.find(a => a.user === savedUser);
+    if(found){ currentAdmin = found; enterApp(); return; }
+  }
+}
+
 /* ================= SCREEN NAVIGATION ================= */
 function showScreen(name){
   document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
@@ -260,7 +308,7 @@ function removeCustomRoom(id){
 
 function clearCustomMap(){
   [...customRooms].forEach(r => removeCustomRoom(r.id));
-  localStorage.removeItem("custom-map-rooms")
+  localStorage.removeItem("custom-map-rooms:" + currentAdmin.schoolId);
 }
 
 function renderRoomList(){
@@ -290,23 +338,22 @@ function customRoomTickOne(r){
 function customRoomsTick(){ customRooms.forEach(customRoomTickOne); }
 
 /* ---------- persistence (per-user, private) ---------- */
-function saveCustomMap(){
+async function saveCustomMap(){
   const statusEl = document.getElementById("saveStatus");
   try{
     const payload = customRooms.map(r => ({ name:r.name, cap:r.cap, ap:r.ap, x:r.x, y:r.y, w:r.w, h:r.h }));
-    localStorage.setItem("custom-map-rooms", JSON.stringify(payload));
+    localStorage.setItem("custom-map-rooms:" + currentAdmin.schoolId, JSON.stringify(payload));
     statusEl.textContent = "Salvo ✓ — vai continuar aqui da próxima vez";
   }catch(err){ statusEl.textContent = "Não consegui salvar agora"; }
 }
 
-function loadCustomMap(){
+async function loadCustomMap(){
   try{
-    const raw = localStorage.getItem("custom-map-rooms");
+    const raw = localStorage.getItem("custom-map-rooms:" + currentAdmin.schoolId);
     if(raw){ JSON.parse(raw).forEach(data => addCustomRoom(data)); }
-  }catch(err){ /* nada salvo ainda */ }
+  }catch(err){ /* nada salvo ainda pra essa escola */ }
   updateEmptyNote();
 }
-loadCustomMap();
 
 /* ================= BOOT ================= */
 render();
