@@ -1,0 +1,14 @@
+{
+  "name": "Mapa Inteligente EFG",
+  "short_name": "Mapa EFG",
+  "description": "Sistema de mapeamento e ocupação escolar em tempo real",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#0a1220",
+  "theme_color": "#0a1220",
+  "orientation": "portrait-primary",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

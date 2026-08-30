@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mapa Inteligente — EFG Sarah Luisa Lemos Kunirtschek de Oliveira</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0a1220">
+    <link rel="apple-touch-icon" href="icons/icon-192.png">
+</head>
+
+<body>
+
+    <div class="topbar">
+        <div class="topbar-brand">
+            <div class="topbar-logo">🏫</div>
+            <div class="topbar-name">Mapa Inteligente<small>EFG Sarah Luisa Lemos Kunirtschek de Oliveira</small></div>
+        </div>
+        <div class="status-pill-top">🔧 Dados simulados</div>
+    </div>
+
+    <div class="wrap">
+
+        <!-- ============ HOME ============ -->
+        <section class="screen active" id="screen-home">
+            <div class="hero">
+                <div class="hero-eyebrow"><span class="dot"></span> Protótipo em desenvolvimento</div>
+                <h1>Sistema Inteligente de Mapeamento e Ocupação Escolar</h1>
+                <p>Acompanhe em tempo real quantos dispositivos estão conectados em cada ambiente da escola, veja onde
+                    há mais gente e monte o mapa dos seus próprios espaços.</p>
+            </div>
+
+            <div class="home-stats">
+                <div class="home-stat total">
+                    <div class="num" id="statTotal">--</div>
+                    <div class="label">dispositivos conectados agora</div>
+                </div>
+                <div class="home-stat alert">
+                    <div class="num" id="statAlert">--</div>
+                    <div class="label">ambientes lotados</div>
+                </div>
+            </div>
+
+            <div class="data-banner">
+                ⚠️ <span><b>Fonte de dados:</b> por enquanto os números são simulados. A integração com o Wi-Fi real da
+                    escola depende de autorização do TI/coordenação da EFG — acompanhe o status em
+                    <b>Configurações</b>.</span>
+            </div>
+
+            <div class="shortcut-grid">
+                <button class="shortcut-card" onclick="showScreen('map')">
+                    <div class="ic">🗺️</div>
+                    <div class="t">Ver mapa ao vivo</div>
+                    <div class="d">Ocupação de cada sala, laboratório e biblioteca em tempo real</div>
+                </button>
+                <button class="shortcut-card" onclick="showScreen('editor')">
+                    <div class="ic">✏️</div>
+                    <div class="t">Criar meu mapa</div>
+                    <div class="d">Desenhe suas próprias salas e veja a simulação rodando nelas</div>
+                </button>
+                <button class="shortcut-card" onclick="showScreen('settings')">
+                    <div class="ic">⚙️</div>
+                    <div class="t">Configurações</div>
+                    <div class="d">Status da integração com o Wi-Fi e dados do app</div>
+                </button>
+            </div>
+        </section>
+
+        <!-- ============ MAPA AO VIVO ============ -->
+        <section class="screen" id="screen-map">
+            <div class="legend">
+                <div class="item"><span class="sw" style="background:var(--good)"></span> Ocupação normal</div>
+                <div class="item"><span class="sw" style="background:var(--warn)"></span> Muita gente</div>
+                <div class="item"><span class="sw" style="background:var(--bad)"></span> Lotado</div>
+                <div class="item"><span class="sw" style="background:var(--ap)"></span> Ponto de acesso Wi-Fi</div>
+                <div class="item"><span class="sw line"></span> Parede</div>
+            </div>
+
+            <div class="layout">
+                <div class="map-card">
+                    <div class="map-title">
+                        <h2>Planta Baixa — Bloco Principal (ilustrativa)</h2>
+                        <div class="clock" id="clock">--:--:--</div>
+                    </div>
+
+                    <div class="stage">
+                        <svg viewBox="0 0 900 620" xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+                                    <path d="M 20 0 L 0 0 0 20" fill="none" stroke="var(--grid-line)"
+                                        stroke-width="1" />
+                                </pattern>
+                            </defs>
+
+                            <rect x="50" y="50" width="800" height="520" fill="url(#grid)" />
+
+                            <g id="furniture" stroke="var(--furniture)" stroke-width="1.5" fill="none"></g>
+
+                            <g stroke="var(--wall)" stroke-width="4" stroke-linecap="square">
+                                <line x1="50" y1="50" x2="850" y2="50" />
+                                <line x1="850" y1="50" x2="850" y2="570" />
+                                <line x1="850" y1="570" x2="50" y2="570" />
+                                <line x1="50" y1="50" x2="50" y2="220" />
+                                <line x1="50" y1="260" x2="50" y2="570" />
+                                <line x1="310" y1="50" x2="310" y2="200" />
+                                <line x1="50" y1="200" x2="150" y2="200" />
+                                <line x1="190" y1="200" x2="410" y2="200" />
+                                <line x1="450" y1="200" x2="570" y2="200" />
+                                <line x1="50" y1="290" x2="150" y2="290" />
+                                <line x1="190" y1="290" x2="410" y2="290" />
+                                <line x1="450" y1="290" x2="570" y2="290" />
+                                <line x1="310" y1="290" x2="310" y2="570" />
+                                <line x1="570" y1="50" x2="570" y2="220" />
+                                <line x1="570" y1="260" x2="570" y2="570" />
+                            </g>
+
+                            <g stroke="var(--wall)" stroke-width="1.5" fill="none" opacity="0.75">
+                                <line x1="150" y1="200" x2="150" y2="240" />
+                                <path d="M190,200 A40,40 0 0 1 150,240" />
+                                <line x1="410" y1="200" x2="410" y2="240" />
+                                <path d="M450,200 A40,40 0 0 1 410,240" />
+                                <line x1="150" y1="290" x2="150" y2="330" />
+                                <path d="M190,290 A40,40 0 0 1 150,330" />
+                                <line x1="410" y1="290" x2="410" y2="330" />
+                                <path d="M450,290 A40,40 0 0 1 410,330" />
+                                <line x1="570" y1="220" x2="610" y2="220" />
+                                <path d="M570,260 A40,40 0 0 1 610,220" />
+                                <line x1="50" y1="260" x2="90" y2="260" />
+                                <path d="M50,220 A40,40 0 0 1 90,260" />
+                            </g>
+
+                            <text x="20" y="245" fill="var(--text-faint)" font-family="JetBrains Mono, monospace"
+                                font-size="9" transform="rotate(-90 20,245)" text-anchor="middle"
+                                letter-spacing="1">ENTRADA</text>
+
+                            <g id="access-points">
+                                <g transform="translate(310,58)">
+                                    <circle r="10" fill="none" stroke="var(--ap)" stroke-width="1" opacity="0.5">
+                                        <animate attributeName="r" values="5;18" dur="2.4s" repeatCount="indefinite" />
+                                        <animate attributeName="opacity" values="0.6;0" dur="2.4s"
+                                            repeatCount="indefinite" />
+                                    </circle>
+                                    <circle r="4.5" fill="var(--ap)" />
+                                    <text x="10" y="4" fill="var(--ap)" font-family="JetBrains Mono, monospace"
+                                        font-size="9" font-weight="700">AP-01</text>
+                                </g>
+                                <g transform="translate(300,245)">
+                                    <circle r="10" fill="none" stroke="var(--ap)" stroke-width="1" opacity="0.5">
+                                        <animate attributeName="r" values="5;18" dur="2.4s" begin="0.5s"
+                                            repeatCount="indefinite" />
+                                        <animate attributeName="opacity" values="0.6;0" dur="2.4s" begin="0.5s"
+                                            repeatCount="indefinite" />
+                                    </circle>
+                                    <circle r="4.5" fill="var(--ap)" />
+                                    <text x="10" y="4" fill="var(--ap)" font-family="JetBrains Mono, monospace"
+                                        font-size="9" font-weight="700">AP-02</text>
+                                </g>
+                                <g transform="translate(310,435)">
+                                    <circle r="10" fill="none" stroke="var(--ap)" stroke-width="1" opacity="0.5">
+                                        <animate attributeName="r" values="5;18" dur="2.4s" begin="1s"
+                                            repeatCount="indefinite" />
+                                        <animate attributeName="opacity" values="0.6;0" dur="2.4s" begin="1s"
+                                            repeatCount="indefinite" />
+                                    </circle>
+                                    <circle r="4.5" fill="var(--ap)" />
+                                    <text x="10" y="4" fill="var(--ap)" font-family="JetBrains Mono, monospace"
+                                        font-size="9" font-weight="700">AP-03</text>
+                                </g>
+                                <g transform="translate(710,300)">
+                                    <circle r="10" fill="none" stroke="var(--ap)" stroke-width="1" opacity="0.5">
+                                        <animate attributeName="r" values="5;18" dur="2.4s" begin="1.5s"
+                                            repeatCount="indefinite" />
+                                        <animate attributeName="opacity" values="0.6;0" dur="2.4s" begin="1.5s"
+                                            repeatCount="indefinite" />
+                                    </circle>
+                                    <circle r="4.5" fill="var(--ap)" />
+                                    <text x="10" y="4" fill="var(--ap)" font-family="JetBrains Mono, monospace"
+                                        font-size="9" font-weight="700">AP-04</text>
+                                </g>
+                            </g>
+                        </svg>
+
+                        <div id="corredor-label" style="left:8%; top:34%;">↞ Corredor Central ↠</div>
+
+                        <div class="room" id="sala1" style="left:5.56%; top:8.06%; width:28.89%; height:24.19%;">
+                            <div class="room-top">
+                                <div>
+                                    <div class="room-name">Sala 01</div>
+                                    <div class="room-sub">1º ano</div>
+                                </div>
+                                <div class="status-pill">normal</div>
+                            </div>
+                            <div class="room-count" id="sala1-count">--<small>/35</small></div>
+                            <div class="dot-layer" id="sala1-dots"></div>
+                            <div class="bar-track">
+                                <div class="bar-fill" id="sala1-bar" style="width:0%"></div>
+                            </div>
+                        </div>
+
+                        <div class="room" id="sala2" style="left:34.44%; top:8.06%; width:28.89%; height:24.19%;">
+                            <div class="room-top">
+                                <div>
+                                    <div class="room-name">Sala 02</div>
+                                    <div class="room-sub">2º ano</div>
+                                </div>
+                                <div class="status-pill">normal</div>
+                            </div>
+                            <div class="room-count" id="sala2-count">--<small>/35</small></div>
+                            <div class="dot-layer" id="sala2-dots"></div>
+                            <div class="bar-track">
+                                <div class="bar-fill" id="sala2-bar" style="width:0%"></div>
+                            </div>
+                        </div>
+
+                        <div class="room" id="labrob" style="left:5.56%; top:46.77%; width:28.89%; height:45.16%;">
+                            <div class="room-top">
+                                <div>
+                                    <div class="room-name">Lab. Robótica</div>
+                                    <div class="room-sub">Bloco técnico</div>
+                                </div>
+                                <div class="status-pill">normal</div>
+                            </div>
+                            <div class="room-count" id="labrob-count">--<small>/20</small></div>
+                            <div class="dot-layer" id="labrob-dots"></div>
+                            <div class="bar-track">
+                                <div class="bar-fill" id="labrob-bar" style="width:0%"></div>
+                            </div>
+                        </div>
+
+                        <div class="room" id="labti" style="left:34.44%; top:46.77%; width:28.89%; height:45.16%;">
+                            <div class="room-top">
+                                <div>
+                                    <div class="room-name">Lab. de TI</div>
+                                    <div class="room-sub">Bloco técnico</div>
+                                </div>
+                                <div class="status-pill">normal</div>
+                            </div>
+                            <div class="room-count" id="labti-count">--<small>/30</small></div>
+                            <div class="dot-layer" id="labti-dots"></div>
+                            <div class="bar-track">
+                                <div class="bar-fill" id="labti-bar" style="width:0%"></div>
+                            </div>
+                        </div>
+
+                        <div class="room" id="bib" style="left:63.33%; top:8.06%; width:31.11%; height:83.87%;">
+                            <div class="room-top">
+                                <div>
+                                    <div class="room-name">Biblioteca</div>
+                                    <div class="room-sub">Bloco A</div>
+                                </div>
+                                <div class="status-pill">normal</div>
+                            </div>
+                            <div class="room-count" id="bib-count">--<small>/40</small></div>
+                            <div class="dot-layer" id="bib-dots"></div>
+                            <div class="bar-track">
+                                <div class="bar-fill" id="bib-bar" style="width:0%"></div>
+                            </div>
+                        </div>
+
+                        <div class="scale-note">DESENHO ILUSTRATIVO · SEM ESCALA REAL</div>
+                    </div>
+                </div>
+
+                <div class="side" id="sidePanel">
+                    <h3>Detalhes do ambiente</h3>
+                    <div class="empty" id="sideEmpty">Toque em uma sala na planta para ver detalhes: histórico de
+                        dispositivos conectados, ponto de acesso responsável e capacidade.</div>
+                    <div id="sideContent" style="display:none;">
+                        <div class="detail-name" id="dName">—</div>
+                        <div class="detail-sub" id="dSub">—</div>
+                        <div class="detail-row"><span class="k">Dispositivos conectados</span><span class="v"
+                                id="dCount">—</span></div>
+                        <div class="detail-row"><span class="k">Capacidade do ambiente</span><span class="v"
+                                id="dCap">—</span></div>
+                        <div class="detail-row"><span class="k">Ponto de acesso</span><span class="v" id="dAp">—</span>
+                        </div>
+                        <div class="detail-row"><span class="k">Última atualização</span><span class="v"
+                                id="dTime">—</span></div>
+                        <div class="insight" id="dInsight"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============ CRIAR MEU MAPA ============ -->
+        <section class="screen" id="screen-editor">
+            <div class="map-card">
+                <div class="editor-toolbar">
+                    <div class="editor-hint">Clique e arraste dentro do quadro pra desenhar uma sala. Solte pra dar nome
+                        e capacidade. Cada sala criada já entra na simulação de ocupação.</div>
+                    <button class="btn-ghost" onclick="clearCustomMap()">Limpar tudo</button>
+                </div>
+
+                <div class="editor-canvas-outer">
+                    <div class="editor-canvas" id="editorCanvas">
+                        <div class="editor-empty-note" id="editorEmptyNote">Arraste aqui pra desenhar sua primeira sala
+                            🏫</div>
+                        <div class="draft-rect" id="draftRect"></div>
+                    </div>
+                </div>
+
+                <div class="editor-room-list" id="editorRoomList"></div>
+
+                <div class="editor-actions">
+                    <button class="btn-primary" onclick="saveCustomMap()">Salvar meu mapa</button>
+                    <span class="save-status" id="saveStatus"></span>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============ CONFIGURAÇÕES ============ -->
+        <section class="screen" id="screen-settings">
+            <div class="settings-section">
+                <h3>Fonte de dados</h3>
+                <div class="sub">De onde vêm os números de ocupação mostrados no mapa.</div>
+
+                <div class="source-option selected">
+                    <div class="source-radio"></div>
+                    <div>
+                        <div class="t">Dados simulados (ativo)</div>
+                        <div class="d">Os números que você vê agora são gerados automaticamente pra testar o app, sem
+                            depender da rede da escola.</div>
+                    </div>
+                </div>
+
+                <div class="source-option disabled">
+                    <div class="source-radio"></div>
+                    <div>
+                        <div class="t">Wi-Fi real da EFG <span class="lock-tag">🔒 em breve</span></div>
+                        <div class="d">Vai usar os pontos de acesso da escola pra contar dispositivos por ambiente de
+                            verdade. Depende de autorização do TI/coordenação.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <h3>Conexão com a rede da escola</h3>
+                <div class="sub">Esses campos ficam desativados até termos acesso autorizado ao sistema de Wi-Fi da EFG.
+                </div>
+
+                <div class="field-row">
+                    <label>Endereço do controlador / roteador central</label>
+                    <input type="text" placeholder="ex: 192.168.0.1 ou painel.efg.local" disabled>
+                </div>
+                <div class="field-row">
+                    <label>Usuário de leitura (somente consulta)</label>
+                    <input type="text" placeholder="fornecido pelo TI da escola" disabled>
+                </div>
+                <div class="field-row">
+                    <label>Chave de API / Token</label>
+                    <input type="password" placeholder="••••••••••••" disabled>
+                </div>
+                <div class="field-note">Assim que a escola liberar o acesso, esses campos são preenchidos e a fonte de
+                    dados muda de "simulado" pra "Wi-Fi real" — o resto do app continua funcionando exatamente igual.
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <h3>Meus dados</h3>
+                <div class="sub">O mapa que você desenha em "Criar meu mapa" fica salvo só neste dispositivo/conta.
+                </div>
+                <button class="btn-ghost"
+                    onclick="clearCustomMap(); document.getElementById('saveStatus').textContent='';">Apagar meu mapa
+                    salvo</button>
+            </div>
+
+            <div class="settings-section">
+                <h3>Sobre o projeto</h3>
+                <div class="about-text">
+                    Sistema Inteligente de Mapeamento e Ocupação de Ambientes Escolares em Tempo Real — desenvolvido
+                    como projeto na EFG Sarah Luisa Lemos Kunirtschek de Oliveira. Versão de protótipo, dados de
+                    ocupação simulados até a integração com a infraestrutura de Wi-Fi da escola ser autorizada.
+                </div>
+            </div>
+        </section>
+
+        <footer class="app-footer">DADOS SIMULADOS PARA FINS DE PROTÓTIPO · NENHUM DISPOSITIVO REAL FOI RASTREADO
+        </footer>
+    </div>
+
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="room-form-card">
+            <h4>Nova sala</h4>
+            <label>Nome da sala
+                <input id="rfName" type="text" placeholder="Ex: Sala 03">
+            </label>
+            <label>Capacidade (nº de pessoas)
+                <input id="rfCap" type="number" value="30" min="1" max="200">
+            </label>
+            <label>Ponto de acesso Wi-Fi (opcional)
+                <input id="rfAp" type="text" placeholder="Ex: AP-05">
+            </label>
+            <div class="room-form-actions">
+                <button class="btn-ghost" onclick="cancelRoomForm()">Cancelar</button>
+                <button class="btn-primary" onclick="confirmRoomForm()">Adicionar sala</button>
+            </div>
+        </div>
+    </div>
+
+    <nav class="bottom-nav">
+        <button class="nav-btn active" data-screen="home" onclick="showScreen('home')"><span
+                class="ic">🏠</span>Início</button>
+        <button class="nav-btn" data-screen="map" onclick="showScreen('map')"><span class="ic">🗺️</span>Mapa</button>
+        <button class="nav-btn" data-screen="editor" onclick="showScreen('editor')"><span
+                class="ic">✏️</span>Criar</button>
+        <button class="nav-btn" data-screen="settings" onclick="showScreen('settings')"><span
+                class="ic">⚙️</span>Config</button>
+    </nav>
+
+    <script src="js/script.js"></script>
+</body>
+
+</html>
