@@ -201,6 +201,8 @@ const editorCanvas = document.getElementById("editorCanvas");
 const draftRect = document.getElementById("draftRect");
 const emptyNote = document.getElementById("editorEmptyNote");
 
+let activeOp = null; // { type: "draw"|"move"|"resize", ...dados da operação }
+
 function pctFromEvent(clientX, clientY){
   const rect = editorCanvas.getBoundingClientRect();
   const x = Math.min(100, Math.max(0, (clientX - rect.left) / rect.width * 100));
@@ -216,26 +218,76 @@ function paintDraft(box){
   draftRect.style.height = box.h + "%";
 }
 
-let drawing = false, startPt = null;
-function startDraw(clientX, clientY){ startPt = pctFromEvent(clientX, clientY); drawing = true; paintDraft(normBox(startPt.x, startPt.y, startPt.x, startPt.y)); }
-function moveDraw(clientX, clientY){ if(!drawing) return; const cur = pctFromEvent(clientX, clientY); paintDraft(normBox(startPt.x, startPt.y, cur.x, cur.y)); }
-function endDraw(clientX, clientY){
-  if(!drawing) return;
-  drawing = false;
+/* ---- desenhar sala nova (arrastar no fundo vazio) ---- */
+function startDraw(clientX, clientY){
+  const p = pctFromEvent(clientX, clientY);
+  activeOp = { type: "draw", startX: p.x, startY: p.y };
+  paintDraft(normBox(p.x, p.y, p.x, p.y));
+}
+function stepDraw(clientX, clientY){
   const cur = pctFromEvent(clientX, clientY);
-  const box = normBox(startPt.x, startPt.y, cur.x, cur.y);
+  paintDraft(normBox(activeOp.startX, activeOp.startY, cur.x, cur.y));
+}
+function finishDraw(clientX, clientY){
+  const cur = pctFromEvent(clientX, clientY);
+  const box = normBox(activeOp.startX, activeOp.startY, cur.x, cur.y);
   draftRect.style.display = "none";
-  if(box.w < 4 || box.h < 4) return;
-  pendingBox = box;
-  openRoomForm();
+  if(box.w >= 4 && box.h >= 4){ pendingBox = box; openRoomForm(); }
 }
 
-editorCanvas.addEventListener("mousedown", e => startDraw(e.clientX, e.clientY));
-window.addEventListener("mousemove", e => moveDraw(e.clientX, e.clientY));
-window.addEventListener("mouseup", e => endDraw(e.clientX, e.clientY));
-editorCanvas.addEventListener("touchstart", e => { const t=e.touches[0]; startDraw(t.clientX, t.clientY); e.preventDefault(); }, {passive:false});
-editorCanvas.addEventListener("touchmove", e => { const t=e.touches[0]; moveDraw(t.clientX, t.clientY); e.preventDefault(); }, {passive:false});
-editorCanvas.addEventListener("touchend", e => { const t=e.changedTouches[0]; endDraw(t.clientX, t.clientY); });
+/* ---- mover sala existente (arrastar em cima dela) ---- */
+function startMove(entry, clientX, clientY){
+  activeOp = { type: "move", entry, startX: clientX, startY: clientY, origX: entry.x, origY: entry.y };
+}
+function stepMove(clientX, clientY){
+  const rect = editorCanvas.getBoundingClientRect();
+  const dx = (clientX - activeOp.startX) / rect.width * 100;
+  const dy = (clientY - activeOp.startY) / rect.height * 100;
+  const entry = activeOp.entry;
+  entry.x = Math.min(100 - entry.w, Math.max(0, activeOp.origX + dx));
+  entry.y = Math.min(100 - entry.h, Math.max(0, activeOp.origY + dy));
+  entry.els.root.style.left = entry.x + "%";
+  entry.els.root.style.top = entry.y + "%";
+}
+function finishMove(){ /* nada extra a fazer, o objeto já tá com x/y atualizado */ }
+
+/* ---- redimensionar sala existente (arrastar a alcinha do canto) ---- */
+function startResize(entry, clientX, clientY){
+  activeOp = { type: "resize", entry, startX: clientX, startY: clientY, origW: entry.w, origH: entry.h };
+}
+function stepResize(clientX, clientY){
+  const rect = editorCanvas.getBoundingClientRect();
+  const dx = (clientX - activeOp.startX) / rect.width * 100;
+  const dy = (clientY - activeOp.startY) / rect.height * 100;
+  const entry = activeOp.entry;
+  entry.w = Math.max(6, Math.min(100 - entry.x, activeOp.origW + dx));
+  entry.h = Math.max(6, Math.min(100 - entry.y, activeOp.origH + dy));
+  entry.els.root.style.width = entry.w + "%";
+  entry.els.root.style.height = entry.h + "%";
+}
+function finishResize(){ /* idem */ }
+
+/* ---- despachante único: decide o que fazer conforme activeOp.type ---- */
+function handlePointerMove(clientX, clientY){
+  if(!activeOp) return;
+  if(activeOp.type === "draw") stepDraw(clientX, clientY);
+  else if(activeOp.type === "move") stepMove(clientX, clientY);
+  else if(activeOp.type === "resize") stepResize(clientX, clientY);
+}
+function handlePointerUp(clientX, clientY){
+  if(!activeOp) return;
+  if(activeOp.type === "draw") finishDraw(clientX, clientY);
+  else if(activeOp.type === "move") finishMove();
+  else if(activeOp.type === "resize") finishResize();
+  activeOp = null;
+}
+
+editorCanvas.addEventListener("mousedown", e => { if(e.target === editorCanvas) startDraw(e.clientX, e.clientY); });
+window.addEventListener("mousemove", e => handlePointerMove(e.clientX, e.clientY));
+window.addEventListener("mouseup", e => handlePointerUp(e.clientX, e.clientY));
+editorCanvas.addEventListener("touchstart", e => { if(e.target === editorCanvas){ const t=e.touches[0]; startDraw(t.clientX, t.clientY); e.preventDefault(); } }, {passive:false});
+window.addEventListener("touchmove", e => { if(activeOp){ const t=e.touches[0]; handlePointerMove(t.clientX, t.clientY); } }, {passive:false});
+window.addEventListener("touchend", e => { if(activeOp){ const t=e.changedTouches[0]; handlePointerUp(t.clientX, t.clientY); } });
 
 function openRoomForm(){
   document.getElementById("rfName").value = "";
@@ -259,22 +311,23 @@ function capVisualFor(cap){ return Math.min(12, Math.max(4, Math.round(cap/3)));
 function addCustomRoom(data){
   const id = "custom" + (customIdCounter++);
   const root = document.createElement("div");
-  root.className = "room";
-  root.style.left = data.x + "%";
-  root.style.top = data.y + "%";
-  root.style.width = data.w + "%";
-  root.style.height = data.h + "%";
-  root.dataset.status = "good";
-  root.innerHTML = `
-    <button class="room-delete" title="Remover sala">×</button>
-    <div class="room-top">
-      <div><div class="room-name">${escapeHtml(data.name)}</div><div class="room-sub">Cap. ${data.cap} · ${escapeHtml(data.ap)}</div></div>
-      <div class="status-pill">normal</div>
-    </div>
-    <div class="room-count">--<small>/${data.cap}</small></div>
-    <div class="dot-layer"></div>
-    <div class="bar-track"><div class="bar-fill" style="width:0%"></div></div>
-  `;
+    root.className = "room room-move-handle";
+    root.style.left = data.x + "%";
+    root.style.top = data.y + "%";
+    root.style.width = data.w + "%";
+    root.style.height = data.h + "%";
+    root.dataset.status = "good";
+    root.innerHTML = `
+      <button class="room-delete" title="Remover sala">×</button>
+      <div class="room-top">
+        <div><div class="room-name">${escapeHtml(data.name)}</div><div class="room-sub">Cap. ${data.cap} · ${escapeHtml(data.ap)}</div></div>
+        <div class="status-pill">normal</div>
+      </div>
+      <div class="room-count">--<small>/${data.cap}</small></div>
+      <div class="dot-layer"></div>
+      <div class="bar-track"><div class="bar-fill" style="width:0%"></div></div>
+      <div class="resize-handle" title="Redimensionar"></div>
+    `;
   editorCanvas.appendChild(root);
 
   const entry = {
@@ -295,6 +348,10 @@ function addCustomRoom(data){
   renderRoomList();
   updateEmptyNote();
   customRoomTickOne(entry);
+    root.querySelector(".room-delete").addEventListener("mousedown", ev => ev.stopPropagation());
+  root.querySelector(".resize-handle").addEventListener("mousedown", ev => { ev.stopPropagation(); startResize(entry, ev.clientX, ev.clientY); });
+  root.querySelector(".resize-handle").addEventListener("touchstart", ev => { ev.stopPropagation(); const t=ev.touches[0]; startResize(entry, t.clientX, t.clientY); e.preventDefault(); }, {passive:false});
+  root.addEventListener("mousedown", ev => { if(ev.target === root || ev.target.closest(".room-top") || ev.target.closest(".room-count")) startMove(entry, ev.clientX, ev.clientY); });
 }
 
 function removeCustomRoom(id){

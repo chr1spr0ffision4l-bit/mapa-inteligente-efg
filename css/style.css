@@ -1092,3 +1092,24 @@ footer.app-footer {
     padding: 12px;
     font-size: 13.5px;
 }
+
+.resize-handle {
+    position: absolute;
+    right: -5px;
+    bottom: -5px;
+    width: 14px;
+    height: 14px;
+    background: var(--ap);
+    border: 2px solid var(--panel);
+    border-radius: 4px;
+    cursor: nwse-resize;
+    z-index: 2;
+}
+
+.room-move-handle {
+    cursor: grab;
+}
+
+.room-move-handle:active {
+    cursor: grabbing;
+}
