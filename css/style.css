@@ -1,20 +1,23 @@
 :root {
-    --bg: #0a1220;
-    --panel: #101b2d;
-    --panel-2: #142033;
-    --line: #22324c;
-    --text: #e7edf7;
-    --text-dim: #8a9ab3;
-    --text-faint: #56637f;
-    --good: #35d99a;
-    --good-glow: rgba(53, 217, 154, 0.35);
-    --warn: #f5b449;
-    --bad: #ff5c72;
-    --ap: #5fb0ff;
-    --wall: #cfe0f5;
-    --furniture: rgba(207, 224, 245, 0.32);
-    --blueprint-fill: #0d1b2f;
-    --grid-line: rgba(95, 176, 255, 0.07);
+    --bg: #f4f9f8;
+    --panel: #ffffff;
+    --panel-2: #eef5f4;
+    --line: #dbe6e3;
+    --text: #0d2c4a;
+    --text-dim: #4d6572;
+    --text-faint: #8296a1;
+    --good: #1a9b7a;
+    --good-glow: rgba(26, 155, 122, 0.30);
+    --warn: #d98c1f;
+    --bad: #e0435a;
+    --ap: #0088a0;
+    --wall: #0d2c4a;
+    --furniture: rgba(13, 44, 74, 0.28);
+    --blueprint-fill: #ffffff;
+    --grid-line: rgba(0, 136, 160, 0.08);
+    --brand-navy: #002868;
+    --brand-teal: #20b078;
+    --brand-blue: #0088a0;
 }
 
 * {
@@ -28,14 +31,13 @@ body {
     height: 100%;
 }
 
-body {
-    background: radial-gradient(1200px 700px at 15% -10%, #142c4a 0%, var(--bg) 55%), var(--bg);
-    color: var(--text);
-    font-family: 'Inter', sans-serif;
-    min-height: 100vh;
-    padding-bottom: 84px;
-    /* room for bottom nav */
-}
+  body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      padding-bottom: 84px;
+  }
 
 .wrap {
     max-width: 1180px;
@@ -63,17 +65,18 @@ a {
     gap: 10px;
 }
 
-.topbar-logo {
-    width: 32px;
-    height: 32px;
-    border-radius: 9px;
-    background: linear-gradient(135deg, #1c3a5e, #0d1b2f);
-    border: 1px solid var(--line);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 15px;
-}
+  .topbar-logo {
+      width: 36px;
+      height: 36px;
+      border-radius: 9px;
+      background: #fff;
+      border: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px;
+      overflow: hidden;
+  }
 
 .topbar-name {
     font-family: 'Space Grotesk', sans-serif;
