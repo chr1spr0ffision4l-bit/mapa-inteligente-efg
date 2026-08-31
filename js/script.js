@@ -369,7 +369,7 @@ function addCustomRoom(data){
   customRoomTickOne(entry);
     root.querySelector(".room-delete").addEventListener("mousedown", ev => ev.stopPropagation());
   root.querySelector(".resize-handle").addEventListener("mousedown", ev => { ev.stopPropagation(); startResize(entry, ev.clientX, ev.clientY); });
-  root.querySelector(".resize-handle").addEventListener("touchstart", ev => { ev.stopPropagation(); const t=ev.touches[0]; startResize(entry, t.clientX, t.clientY); e.preventDefault(); }, {passive:false});
+  root.querySelector(".resize-handle").addEventListener("touchstart", ev => { ev.stopPropagation(); const t=ev.touches[0]; startResize(entry, t.clientX, t.clientY); ev.preventDefault(); }, {passive:false});
   root.addEventListener("mousedown", ev => { if(ev.target === root || ev.target.closest(".room-top") || ev.target.closest(".room-count")) startMove(entry, ev.clientX, ev.clientY); });
 }
 
