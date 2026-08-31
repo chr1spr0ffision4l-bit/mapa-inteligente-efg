@@ -1113,3 +1113,16 @@ footer.app-footer {
 .room-move-handle:active {
     cursor: grabbing;
 }
+
+.room-form-card select {
+    display: block;
+    width: 100%;
+    margin-top: 6px;
+    background: var(--panel-2);
+    border: 1px solid var(--line);
+    color: var(--text);
+    border-radius: 8px;
+    padding: 9px 10px;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+}

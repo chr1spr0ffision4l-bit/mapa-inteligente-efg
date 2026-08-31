@@ -99,209 +99,35 @@
                 <div class="item"><span class="sw" style="background:var(--warn)"></span> Muita gente</div>
                 <div class="item"><span class="sw" style="background:var(--bad)"></span> Lotado</div>
                 <div class="item"><span class="sw" style="background:var(--ap)"></span> Ponto de acesso Wi-Fi</div>
-                <div class="item"><span class="sw line"></span> Parede</div>
             </div>
-
+        
             <div class="layout">
                 <div class="map-card">
                     <div class="map-title">
-                        <h2>Planta Baixa — Bloco Principal (ilustrativa)</h2>
+                        <h2>Mapa Publicado</h2>
                         <div class="clock" id="clock">--:--:--</div>
                     </div>
-
-                    <div class="stage">
-                        <svg viewBox="0 0 900 620" xmlns="http://www.w3.org/2000/svg">
-                            <defs>
-                                <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
-                                    <path d="M 20 0 L 0 0 0 20" fill="none" stroke="var(--grid-line)"
-                                        stroke-width="1" />
-                                </pattern>
-                            </defs>
-
-                            <rect x="50" y="50" width="800" height="520" fill="url(#grid)" />
-
-                            <g id="furniture" stroke="var(--furniture)" stroke-width="1.5" fill="none"></g>
-
-                            <g stroke="var(--wall)" stroke-width="4" stroke-linecap="square">
-                                <line x1="50" y1="50" x2="850" y2="50" />
-                                <line x1="850" y1="50" x2="850" y2="570" />
-                                <line x1="850" y1="570" x2="50" y2="570" />
-                                <line x1="50" y1="50" x2="50" y2="220" />
-                                <line x1="50" y1="260" x2="50" y2="570" />
-                                <line x1="310" y1="50" x2="310" y2="200" />
-                                <line x1="50" y1="200" x2="150" y2="200" />
-                                <line x1="190" y1="200" x2="410" y2="200" />
-                                <line x1="450" y1="200" x2="570" y2="200" />
-                                <line x1="50" y1="290" x2="150" y2="290" />
-                                <line x1="190" y1="290" x2="410" y2="290" />
-                                <line x1="450" y1="290" x2="570" y2="290" />
-                                <line x1="310" y1="290" x2="310" y2="570" />
-                                <line x1="570" y1="50" x2="570" y2="220" />
-                                <line x1="570" y1="260" x2="570" y2="570" />
-                            </g>
-
-                            <g stroke="var(--wall)" stroke-width="1.5" fill="none" opacity="0.75">
-                                <line x1="150" y1="200" x2="150" y2="240" />
-                                <path d="M190,200 A40,40 0 0 1 150,240" />
-                                <line x1="410" y1="200" x2="410" y2="240" />
-                                <path d="M450,200 A40,40 0 0 1 410,240" />
-                                <line x1="150" y1="290" x2="150" y2="330" />
-                                <path d="M190,290 A40,40 0 0 1 150,330" />
-                                <line x1="410" y1="290" x2="410" y2="330" />
-                                <path d="M450,290 A40,40 0 0 1 410,330" />
-                                <line x1="570" y1="220" x2="610" y2="220" />
-                                <path d="M570,260 A40,40 0 0 1 610,220" />
-                                <line x1="50" y1="260" x2="90" y2="260" />
-                                <path d="M50,220 A40,40 0 0 1 90,260" />
-                            </g>
-
-                            <text x="20" y="245" fill="var(--text-faint)" font-family="JetBrains Mono, monospace"
-                                font-size="9" transform="rotate(-90 20,245)" text-anchor="middle"
-                                letter-spacing="1">ENTRADA</text>
-
-                            <g id="access-points">
-                                <g transform="translate(310,58)">
-                                    <circle r="10" fill="none" stroke="var(--ap)" stroke-width="1" opacity="0.5">
-                                        <animate attributeName="r" values="5;18" dur="2.4s" repeatCount="indefinite" />
-                                        <animate attributeName="opacity" values="0.6;0" dur="2.4s"
-                                            repeatCount="indefinite" />
-                                    </circle>
-                                    <circle r="4.5" fill="var(--ap)" />
-                                    <text x="10" y="4" fill="var(--ap)" font-family="JetBrains Mono, monospace"
-                                        font-size="9" font-weight="700">AP-01</text>
-                                </g>
-                                <g transform="translate(300,245)">
-                                    <circle r="10" fill="none" stroke="var(--ap)" stroke-width="1" opacity="0.5">
-                                        <animate attributeName="r" values="5;18" dur="2.4s" begin="0.5s"
-                                            repeatCount="indefinite" />
-                                        <animate attributeName="opacity" values="0.6;0" dur="2.4s" begin="0.5s"
-                                            repeatCount="indefinite" />
-                                    </circle>
-                                    <circle r="4.5" fill="var(--ap)" />
-                                    <text x="10" y="4" fill="var(--ap)" font-family="JetBrains Mono, monospace"
-                                        font-size="9" font-weight="700">AP-02</text>
-                                </g>
-                                <g transform="translate(310,435)">
-                                    <circle r="10" fill="none" stroke="var(--ap)" stroke-width="1" opacity="0.5">
-                                        <animate attributeName="r" values="5;18" dur="2.4s" begin="1s"
-                                            repeatCount="indefinite" />
-                                        <animate attributeName="opacity" values="0.6;0" dur="2.4s" begin="1s"
-                                            repeatCount="indefinite" />
-                                    </circle>
-                                    <circle r="4.5" fill="var(--ap)" />
-                                    <text x="10" y="4" fill="var(--ap)" font-family="JetBrains Mono, monospace"
-                                        font-size="9" font-weight="700">AP-03</text>
-                                </g>
-                                <g transform="translate(710,300)">
-                                    <circle r="10" fill="none" stroke="var(--ap)" stroke-width="1" opacity="0.5">
-                                        <animate attributeName="r" values="5;18" dur="2.4s" begin="1.5s"
-                                            repeatCount="indefinite" />
-                                        <animate attributeName="opacity" values="0.6;0" dur="2.4s" begin="1.5s"
-                                            repeatCount="indefinite" />
-                                    </circle>
-                                    <circle r="4.5" fill="var(--ap)" />
-                                    <text x="10" y="4" fill="var(--ap)" font-family="JetBrains Mono, monospace"
-                                        font-size="9" font-weight="700">AP-04</text>
-                                </g>
-                            </g>
-                        </svg>
-
-                        <div id="corredor-label" style="left:8%; top:34%;">↞ Corredor Central ↠</div>
-
-                        <div class="room" id="sala1" style="left:5.56%; top:8.06%; width:28.89%; height:24.19%;">
-                            <div class="room-top">
-                                <div>
-                                    <div class="room-name">Sala 01</div>
-                                    <div class="room-sub">1º ano</div>
-                                </div>
-                                <div class="status-pill">normal</div>
-                            </div>
-                            <div class="room-count" id="sala1-count">--<small>/35</small></div>
-                            <div class="dot-layer" id="sala1-dots"></div>
-                            <div class="bar-track">
-                                <div class="bar-fill" id="sala1-bar" style="width:0%"></div>
-                            </div>
+                    <div class="editor-canvas-outer">
+                        <div class="editor-canvas" id="liveStage" style="cursor:default;">
+                            <div class="editor-empty-note" id="liveEmptyNote">Nenhum mapa publicado ainda. Vá em "Criar meu
+                                mapa", monte as salas e clique em "Publicar".</div>
                         </div>
-
-                        <div class="room" id="sala2" style="left:34.44%; top:8.06%; width:28.89%; height:24.19%;">
-                            <div class="room-top">
-                                <div>
-                                    <div class="room-name">Sala 02</div>
-                                    <div class="room-sub">2º ano</div>
-                                </div>
-                                <div class="status-pill">normal</div>
-                            </div>
-                            <div class="room-count" id="sala2-count">--<small>/35</small></div>
-                            <div class="dot-layer" id="sala2-dots"></div>
-                            <div class="bar-track">
-                                <div class="bar-fill" id="sala2-bar" style="width:0%"></div>
-                            </div>
-                        </div>
-
-                        <div class="room" id="labrob" style="left:5.56%; top:46.77%; width:28.89%; height:45.16%;">
-                            <div class="room-top">
-                                <div>
-                                    <div class="room-name">Lab. Robótica</div>
-                                    <div class="room-sub">Bloco técnico</div>
-                                </div>
-                                <div class="status-pill">normal</div>
-                            </div>
-                            <div class="room-count" id="labrob-count">--<small>/20</small></div>
-                            <div class="dot-layer" id="labrob-dots"></div>
-                            <div class="bar-track">
-                                <div class="bar-fill" id="labrob-bar" style="width:0%"></div>
-                            </div>
-                        </div>
-
-                        <div class="room" id="labti" style="left:34.44%; top:46.77%; width:28.89%; height:45.16%;">
-                            <div class="room-top">
-                                <div>
-                                    <div class="room-name">Lab. de TI</div>
-                                    <div class="room-sub">Bloco técnico</div>
-                                </div>
-                                <div class="status-pill">normal</div>
-                            </div>
-                            <div class="room-count" id="labti-count">--<small>/30</small></div>
-                            <div class="dot-layer" id="labti-dots"></div>
-                            <div class="bar-track">
-                                <div class="bar-fill" id="labti-bar" style="width:0%"></div>
-                            </div>
-                        </div>
-
-                        <div class="room" id="bib" style="left:63.33%; top:8.06%; width:31.11%; height:83.87%;">
-                            <div class="room-top">
-                                <div>
-                                    <div class="room-name">Biblioteca</div>
-                                    <div class="room-sub">Bloco A</div>
-                                </div>
-                                <div class="status-pill">normal</div>
-                            </div>
-                            <div class="room-count" id="bib-count">--<small>/40</small></div>
-                            <div class="dot-layer" id="bib-dots"></div>
-                            <div class="bar-track">
-                                <div class="bar-fill" id="bib-bar" style="width:0%"></div>
-                            </div>
-                        </div>
-
-                        <div class="scale-note">DESENHO ILUSTRATIVO · SEM ESCALA REAL</div>
                     </div>
                 </div>
-
+        
                 <div class="side" id="sidePanel">
                     <h3>Detalhes do ambiente</h3>
-                    <div class="empty" id="sideEmpty">Toque em uma sala na planta para ver detalhes: histórico de
-                        dispositivos conectados, ponto de acesso responsável e capacidade.</div>
+                    <div class="empty" id="sideEmpty">Toque em uma sala no mapa para ver detalhes.</div>
                     <div id="sideContent" style="display:none;">
                         <div class="detail-name" id="dName">—</div>
                         <div class="detail-sub" id="dSub">—</div>
                         <div class="detail-row"><span class="k">Dispositivos conectados</span><span class="v"
                                 id="dCount">—</span></div>
-                        <div class="detail-row"><span class="k">Capacidade do ambiente</span><span class="v"
-                                id="dCap">—</span></div>
-                        <div class="detail-row"><span class="k">Ponto de acesso</span><span class="v" id="dAp">—</span>
+                        <div class="detail-row"><span class="k">Capacidade do ambiente</span><span class="v" id="dCap">—</span>
                         </div>
-                        <div class="detail-row"><span class="k">Última atualização</span><span class="v"
-                                id="dTime">—</span></div>
+                        <div class="detail-row"><span class="k">Ponto de acesso</span><span class="v" id="dAp">—</span></div>
+                        <div class="detail-row"><span class="k">Última atualização</span><span class="v" id="dTime">—</span>
+                        </div>
                         <div class="insight" id="dInsight"></div>
                     </div>
                 </div>
@@ -329,6 +155,7 @@
 
                 <div class="editor-actions">
                     <button class="btn-primary" onclick="saveCustomMap()">Salvar meu mapa</button>
+                    <button class="btn-primary" style="background: var(--brand-blue);" onclick="publishMap()">Publicar no mapa ao vivo</button>
                     <span class="save-status" id="saveStatus"></span>
                 </div>
             </div>
@@ -417,6 +244,30 @@
             <label>Ponto de acesso Wi-Fi (opcional)
                 <input id="rfAp" type="text" placeholder="Ex: AP-05">
             </label>
+            <label>Formato
+                <select id="rfShape" onchange="toggleShapeFields()">
+                    <option value="rect">Retângulo</option>
+                    <option value="l">Formato em L</option>
+                </select>
+            </label>
+            <div id="rfRadiusRow" style="margin-bottom:14px;">
+                <label style="margin-bottom:6px;">Cantos arredondados</label>
+                <input type="range" id="rfRadius" min="0" max="30" value="6" style="width:100%;">
+            </div>
+            <div id="rfLFields" style="display:none;">
+                <label>Canto cortado
+                    <select id="rfCorner">
+                        <option value="br">Inferior direito</option>
+                        <option value="bl">Inferior esquerdo</option>
+                        <option value="tr">Superior direito</option>
+                        <option value="tl">Superior esquerdo</option>
+                    </select>
+                </label>
+                <div style="margin-bottom:14px;">
+                    <label style="margin-bottom:6px;">Tamanho do corte</label>
+                    <input type="range" id="rfNotch" min="15" max="60" value="35" style="width:100%;">
+                </div>
+            </div>
             <div class="room-form-actions">
                 <button class="btn-ghost" onclick="cancelRoomForm()">Cancelar</button>
                 <button class="btn-primary" onclick="confirmRoomForm()">Adicionar sala</button>

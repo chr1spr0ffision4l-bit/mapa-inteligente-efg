@@ -27,6 +27,7 @@ function enterApp(){
   document.getElementById("appRoot").style.display = "block";
   document.querySelector(".topbar-name small").textContent = currentAdmin.schoolName;
   loadCustomMap(); // agora que sabemos quem logou, carrega o mapa certo
+  renderLiveCustomMap();
 }
 
 function logout(){
@@ -164,6 +165,8 @@ function tick(){
   }
   render();
   customRoomsTick();
+  liveRooms.forEach(customRoomTickOne);
+  if(window.__selectedLive) showLiveDetail(window.__selectedLive);
 }
 
 function updateClock(){ document.getElementById("clock").textContent = new Date().toLocaleTimeString("pt-BR"); }
@@ -175,6 +178,8 @@ function insightFor(r, status){
 }
 
 function selectRoom(id){
+  window.__selectedLive = null;
+  window.__selected = id;
   window.__selected = id;
   document.querySelectorAll(".room").forEach(el => el.classList.remove("selected"));
   document.getElementById(id).classList.add("selected");
@@ -293,15 +298,27 @@ function openRoomForm(){
   document.getElementById("rfName").value = "";
   document.getElementById("rfCap").value = 30;
   document.getElementById("rfAp").value = "";
+  document.getElementById("rfShape").value = "rect";
+  document.getElementById("rfCorner").value = "br";
+  document.getElementById("rfNotch").value = 35;
+  document.getElementById("rfNotchVal").textContent = "35%";
+  document.getElementById("rfRadius").value = 6;
+  document.getElementById("rfRadiusVal").textContent = "6px";
+  toggleShapeFields();
   document.getElementById("modalOverlay").style.display = "flex";
   setTimeout(() => document.getElementById("rfName").focus(), 50);
 }
+
 function cancelRoomForm(){ pendingBox = null; document.getElementById("modalOverlay").style.display = "none"; }
 function confirmRoomForm(){
   const name = document.getElementById("rfName").value.trim() || ("Sala " + (customRooms.length + 1));
   const cap = Math.max(1, parseInt(document.getElementById("rfCap").value, 10) || 30);
   const ap = document.getElementById("rfAp").value.trim() || "—";
-  if(pendingBox) addCustomRoom({ name, cap, ap, ...pendingBox });
+  const shape = document.getElementById("rfShape").value;
+  const corner = document.getElementById("rfCorner").value;
+  const notch = parseInt(document.getElementById("rfNotch").value, 10);
+  const radius = parseInt(document.getElementById("rfRadius").value, 10);
+  if(pendingBox) addCustomRoom({ name, cap, ap, shape, corner, notch, radius, ...pendingBox });
   pendingBox = null;
   document.getElementById("modalOverlay").style.display = "none";
 }
@@ -330,9 +347,11 @@ function addCustomRoom(data){
     `;
   editorCanvas.appendChild(root);
 
+  applyShapeStyle(root, data);
+
   const entry = {
     id, name: data.name, cap: data.cap, ap: data.ap,
-    x: data.x, y: data.y, w: data.w, h: data.h,
+    x: data.x, y: data.y, w: data.w, h: data.h,     shape: data.shape, corner: data.corner, notch: data.notch, radius: data.radius,
     count: Math.floor(Math.random() * data.cap * 0.6),
     dotsArr: [],
     els: {
@@ -398,7 +417,7 @@ function customRoomsTick(){ customRooms.forEach(customRoomTickOne); }
 async function saveCustomMap(){
   const statusEl = document.getElementById("saveStatus");
   try{
-    const payload = customRooms.map(r => ({ name:r.name, cap:r.cap, ap:r.ap, x:r.x, y:r.y, w:r.w, h:r.h }));
+    const payload = customRooms.map(r => ({ name:r.name, cap:r.cap, ap:r.ap, x:r.x, y:r.y, w:r.w, h:r.h, shape:r.shape, corner:r.corner, notch:r.notch, radius:r.radius }));
     localStorage.setItem("custom-map-rooms:" + currentAdmin.schoolId, JSON.stringify(payload));
     statusEl.textContent = "Salvo ✓ — vai continuar aqui da próxima vez";
   }catch(err){ statusEl.textContent = "Não consegui salvar agora"; }
@@ -410,6 +429,117 @@ async function loadCustomMap(){
     if(raw){ JSON.parse(raw).forEach(data => addCustomRoom(data)); }
   }catch(err){ /* nada salvo ainda pra essa escola */ }
   updateEmptyNote();
+}
+
+function toggleShapeFields(){
+  const isL = document.getElementById("rfShape").value === "l";
+  document.getElementById("rfLFields").style.display = isL ? "block" : "none";
+}
+
+function applyShapeStyle(root, data){
+  if(data.shape === "l"){
+    const n = data.notch || 35;
+    const c = data.corner || "br";
+    let poly;
+    if(c === "br") poly = `polygon(0% 0%, 100% 0%, 100% ${100-n}%, ${100-n}% ${100-n}%, ${100-n}% 100%, 0% 100%)`;
+    else if(c === "bl") poly = `polygon(0% 0%, 100% 0%, 100% 100%, ${n}% 100%, ${n}% ${100-n}%, 0% ${100-n}%)`;
+    else if(c === "tr") poly = `polygon(0% 0%, ${100-n}% 0%, ${100-n}% ${n}%, 100% ${n}%, 100% 100%, 0% 100%)`;
+    else poly = `polygon(${n}% 0%, 100% 0%, 100% 100%, 0% 100%, 0% ${n}%, ${n}% ${n}%)`;
+    root.style.clipPath = poly;
+    root.style.borderRadius = "0px";
+  } else {
+    root.style.clipPath = "none";
+    root.style.borderRadius = (data.radius != null ? data.radius : 6) + "px";
+  }
+}
+
+/* ================= PUBLICAR MAPA ================= */
+let liveRooms = [];
+
+async function publishMap(){
+  const statusEl = document.getElementById("publishStatus");
+  try{
+    const payload = customRooms.map(r => ({ name:r.name, cap:r.cap, ap:r.ap, x:r.x, y:r.y, w:r.w, h:r.h, shape:r.shape, corner:r.corner, notch:r.notch, radius:r.radius }));
+    localStorage.setItem("published-map:" + currentAdmin.schoolId, JSON.stringify(payload));
+    statusEl.textContent = "Publicado ✓ — já está no Mapa ao vivo";
+    renderLiveCustomMap();
+  }catch(err){ statusEl.textContent = "Não consegui publicar agora"; }
+}
+
+function renderLiveCustomMap(){
+  const raw = localStorage.getItem("published-map:" + currentAdmin.schoolId);
+  const demoWrap = document.getElementById("demoStageWrap");
+  const liveWrap = document.getElementById("liveStageWrap");
+  const liveStage = document.getElementById("liveStage");
+  let data = [];
+  try{ data = raw ? JSON.parse(raw) : []; }catch(e){ data = []; }
+
+  if(!data.length){
+    demoWrap.style.display = "";
+    liveWrap.style.display = "none";
+    return;
+  }
+
+  demoWrap.style.display = "none";
+  liveWrap.style.display = "";
+  liveStage.innerHTML = "";
+  liveRooms = [];
+
+  data.forEach((d, i) => {
+    const root = document.createElement("div");
+    root.className = "room";
+    root.style.left = d.x + "%";
+    root.style.top = d.y + "%";
+    root.style.width = d.w + "%";
+    root.style.height = d.h + "%";
+    root.dataset.status = "good";
+    root.innerHTML = `
+      <div class="room-top">
+        <div><div class="room-name">${escapeHtml(d.name)}</div><div class="room-sub">${escapeHtml(d.ap)}</div></div>
+        <div class="status-pill">normal</div>
+      </div>
+      <div class="room-count">--<small>/${d.cap}</small></div>
+      <div class="dot-layer"></div>
+      <div class="bar-track"><div class="bar-fill" style="width:0%"></div></div>
+    `;
+    applyShapeStyle(root, d);
+    liveStage.appendChild(root);
+
+    const entry = {
+      id: "live" + i, name: d.name, cap: d.cap, ap: d.ap,
+      count: Math.floor(Math.random() * d.cap * 0.6),
+      dotsArr: [],
+      els: {
+        root,
+        pill: root.querySelector(".status-pill"),
+        count: root.querySelector(".room-count"),
+        bar: root.querySelector(".bar-fill"),
+        layer: root.querySelector(".dot-layer"),
+      }
+    };
+    root.addEventListener("click", () => {
+      window.__selected = null;
+      window.__selectedLive = entry;
+      document.querySelectorAll("#liveStage .room").forEach(el => el.classList.remove("selected"));
+      root.classList.add("selected");
+      showLiveDetail(entry);
+    });
+    liveRooms.push(entry);
+    customRoomTickOne(entry);
+  });
+}
+
+function showLiveDetail(entry){
+  const status = statusFor(entry.count, entry.cap);
+  document.getElementById("sideEmpty").style.display = "none";
+  document.getElementById("sideContent").style.display = "block";
+  document.getElementById("dName").textContent = entry.name;
+  document.getElementById("dSub").textContent = entry.ap;
+  document.getElementById("dCount").textContent = entry.count + " dispositivos";
+  document.getElementById("dCap").textContent = entry.count + " de " + entry.cap;
+  document.getElementById("dAp").textContent = entry.ap;
+  document.getElementById("dTime").textContent = new Date().toLocaleTimeString("pt-BR");
+  document.getElementById("dInsight").innerHTML = insightFor(entry, status);
 }
 
 /* ================= BOOT ================= */
