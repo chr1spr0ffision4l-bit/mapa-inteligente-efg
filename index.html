@@ -107,21 +107,13 @@
                         <h2>Mapa Publicado</h2>
                         <div class="clock" id="clock">--:--:--</div>
                     </div>
-        <div class="editor-canvas-outer">
-            <div id="demoStageWrap">
-                <div class="editor-canvas" id="demoStage">
-                    <div class="editor-empty-note" id="liveEmptyNote">
-                    Nenhum mapa publicado ainda.
-                    Vá em "Criar meu mapa", monte as salas e clique em "Publicar".
+                    <div class="editor-canvas-outer">
+                        <div class="editor-canvas" id="liveStage" style="cursor:default;">
+                            <div class="editor-empty-note" id="liveEmptyNote">Nenhum mapa publicado ainda. Vá em "Criar meu
+                                mapa", monte as salas e clique em "Publicar".</div>
+                        </div>
                     </div>
-            </div>
-        </div>
-
-    <div id="liveStageWrap" style="display:none;">
-        <div class="stage" id="liveStage"></div>
-    </div>
-
-</div>
+                </div>
         
                 <div class="side" id="sidePanel">
                     <h3>Detalhes do ambiente</h3>
@@ -151,13 +143,13 @@
                     <button class="btn-ghost" onclick="clearCustomMap()">Limpar tudo</button>
                 </div>
 
-        <div class="editor-canvas" id="editorCanvas">
-            <div class="editor-empty-note" id="editorEmptyNote">
-            Arraste aqui pra desenhar sua primeira sala 🏫
-            </div>
-
-            <div class="draft-rect" id="draftRect"></div>
-        </div>
+                <div class="editor-canvas-outer">
+                    <div class="editor-canvas" id="editorCanvas">
+                        <div class="editor-empty-note" id="editorEmptyNote">Arraste aqui pra desenhar sua primeira sala
+                            🏫</div>
+                        <div class="draft-rect" id="draftRect"></div>
+                    </div>
+                </div>
 
                 <div class="editor-room-list" id="editorRoomList"></div>
 
@@ -252,30 +244,30 @@
             <label>Ponto de acesso Wi-Fi (opcional)
                 <input id="rfAp" type="text" placeholder="Ex: AP-05">
             </label>
-<label>Formato
-    <select id="rfShape" onchange="toggleShapeFields()">
-        <option value="rect">Retângulo</option>
-        <option value="l">Formato em L</option>
-    </select>
-</label>
-<div id="rfLFields" style="display:none;">
-    <label>Canto cortado
-        <select id="rfCorner">
-            <option value="br">Inferior direito</option>
-            <option value="bl">Inferior esquerdo</option>
-            <option value="tr">Superior direito</option>
-            <option value="tl">Superior esquerdo</option>
-        </select>
-    </label>
-    <label>Tamanho do corte: <span id="rfNotchVal">35%</span>
-        <input type="range" id="rfNotch" min="15" max="60" value="35"
-            oninput="document.getElementById('rfNotchVal').textContent=this.value+'%'">
-    </label>
-</div>
-<label>Cantos arredondados: <span id="rfRadiusVal">6px</span>
-    <input type="range" id="rfRadius" min="0" max="40" value="6"
-        oninput="document.getElementById('rfRadiusVal').textContent=this.value+'px'">
-</label>
+            <label>Formato
+                <select id="rfShape" onchange="toggleShapeFields()">
+                    <option value="rect">Retângulo</option>
+                    <option value="l">Formato em L</option>
+                </select>
+            </label>
+            <div id="rfRadiusRow" style="margin-bottom:14px;">
+                <label style="margin-bottom:6px;">Cantos arredondados</label>
+                <input type="range" id="rfRadius" min="0" max="30" value="6" style="width:100%;">
+            </div>
+            <div id="rfLFields" style="display:none;">
+                <label>Canto cortado
+                    <select id="rfCorner">
+                        <option value="br">Inferior direito</option>
+                        <option value="bl">Inferior esquerdo</option>
+                        <option value="tr">Superior direito</option>
+                        <option value="tl">Superior esquerdo</option>
+                    </select>
+                </label>
+                <div style="margin-bottom:14px;">
+                    <label style="margin-bottom:6px;">Tamanho do corte</label>
+                    <input type="range" id="rfNotch" min="15" max="60" value="35" style="width:100%;">
+                </div>
+            </div>
             <div class="room-form-actions">
                 <button class="btn-ghost" onclick="cancelRoomForm()">Cancelar</button>
                 <button class="btn-primary" onclick="confirmRoomForm()">Adicionar sala</button>
