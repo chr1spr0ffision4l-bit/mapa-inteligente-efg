@@ -107,16 +107,21 @@
                         <h2>Mapa Publicado</h2>
                         <div class="clock" id="clock">--:--:--</div>
                     </div>
-                    <div class="editor-canvas-outer">
-                        <div class="editor-canvas" id="liveStage" style="cursor:default;">
-                            <div class="editor-empty-note" id="liveEmptyNote">Nenhum mapa publicado ainda. Vá em "Criar meu
-                                mapa", monte as salas e clique em "Publicar".</div>
-                        </div>
+        <div class="editor-canvas-outer">
+            <div id="demoStageWrap">
+                <div class="editor-canvas" id="demoStage">
+                    <div class="editor-empty-note" id="liveEmptyNote">
+                    Nenhum mapa publicado ainda.
+                    Vá em "Criar meu mapa", monte as salas e clique em "Publicar".
                     </div>
-                    <div id="liveStageWrap" style="display:none;">
-                        <div class="stage" id="liveStage" style="background:var(--panel-2);"></div>
-                    </div>
-                </div>
+            </div>
+        </div>
+
+    <div id="liveStageWrap" style="display:none;">
+        <div class="stage" id="liveStage"></div>
+    </div>
+
+</div>
         
                 <div class="side" id="sidePanel">
                     <h3>Detalhes do ambiente</h3>
@@ -146,13 +151,13 @@
                     <button class="btn-ghost" onclick="clearCustomMap()">Limpar tudo</button>
                 </div>
 
-                <div class="editor-canvas-outer">
-                    <div class="editor-canvas" id="editorCanvas">
-                        <div class="editor-empty-note" id="editorEmptyNote">Arraste aqui pra desenhar sua primeira sala
-                            🏫</div>
-                        <div class="draft-rect" id="draftRect"></div>
-                    </div>
-                </div>
+        <div class="editor-canvas" id="editorCanvas">
+            <div class="editor-empty-note" id="editorEmptyNote">
+            Arraste aqui pra desenhar sua primeira sala 🏫
+            </div>
+
+            <div class="draft-rect" id="draftRect"></div>
+        </div>
 
                 <div class="editor-room-list" id="editorRoomList"></div>
 
