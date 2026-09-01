@@ -50,7 +50,7 @@ function showScreen(name){
   window.scrollTo({top:0, behavior:"instant"});
 }
 
-/* ================= RADAR-STYLE DEVICE PINGS (reutilizado no editor e no mapa publicado) ================= */
+/* ================= RADAR-STYLE DEVICE PINGS ================= */
 let dotIdCounter = 0;
 function randDotPos(){ return { x: 6 + Math.random()*88, y: 10 + Math.random()*80 }; }
 function createDot(layer){
@@ -107,6 +107,112 @@ function customRoomTickOne(r){
   r.els.count.innerHTML = r.count + "<small>/"+r.cap+"</small>";
   r.els.bar.style.width = Math.min(100, (r.count/r.cap*100)) + "%";
   syncDotsFor(r.els.layer, r.count, capVisualFor(r.cap), r.dotsArr);
+}
+
+/* ================= MOBÍLIA DAS SALAS ================= */
+const FURNITURE_TYPES = [
+  { type:"chair",    icon:"🪑", label:"Cadeira" },
+  { type:"computer", icon:"💻", label:"Computador" },
+  { type:"shelf",    icon:"📚", label:"Estante" },
+  { type:"bench",    icon:"🔬", label:"Bancada" },
+  { type:"plant",    icon:"🌿", label:"Planta" },
+  { type:"board",    icon:"🖼️", label:"Quadro" },
+];
+function furnitureIcon(type){ const f = FURNITURE_TYPES.find(f => f.type === type); return f ? f.icon : "❓"; }
+
+let furnitureModalRoom = null;
+let furnDrag = null;
+
+function openFurnitureModal(entry){
+  furnitureModalRoom = entry;
+  if(!furnitureModalRoom.furniture) furnitureModalRoom.furniture = [];
+  document.getElementById("furnModalTitle").textContent = "Mobiliar — " + entry.name;
+
+  const palette = document.getElementById("furniturePalette");
+  palette.innerHTML = "";
+  FURNITURE_TYPES.forEach(f => {
+    const btn = document.createElement("button");
+    btn.innerHTML = f.icon + `<span class="lbl">${f.label}</span>`;
+    btn.onclick = () => addFurniture(f.type);
+    palette.appendChild(btn);
+  });
+
+  renderFurnitureCanvas();
+  document.getElementById("furnitureModalOverlay").style.display = "flex";
+}
+function closeFurnitureModal(){
+  document.getElementById("furnitureModalOverlay").style.display = "none";
+  furnitureModalRoom = null;
+}
+
+function addFurniture(type){
+  furnitureModalRoom.furniture.push({ type, x: 40 + Math.random()*20, y: 40 + Math.random()*20 });
+  renderFurnitureCanvas();
+  renderRoomFurnitureMini(furnitureModalRoom);
+}
+
+function renderFurnitureCanvas(){
+  const canvas = document.getElementById("furnitureCanvas");
+  canvas.innerHTML = "";
+  const list = furnitureModalRoom.furniture || [];
+  list.forEach((item, idx) => {
+    const el = document.createElement("div");
+    el.className = "furniture-item";
+    el.style.left = item.x + "%";
+    el.style.top = item.y + "%";
+    el.textContent = furnitureIcon(item.type);
+
+    const del = document.createElement("div");
+    del.className = "fi-del";
+    del.textContent = "×";
+    del.onclick = (ev) => {
+      ev.stopPropagation();
+      list.splice(idx, 1);
+      renderFurnitureCanvas();
+      renderRoomFurnitureMini(furnitureModalRoom);
+    };
+    el.appendChild(del);
+
+    el.addEventListener("mousedown", ev => { ev.stopPropagation(); furnDrag = { item, canvas }; });
+    el.addEventListener("touchstart", ev => { ev.stopPropagation(); furnDrag = { item, canvas }; }, {passive:true});
+    canvas.appendChild(el);
+  });
+}
+
+window.addEventListener("mousemove", e => {
+  if(!furnDrag) return;
+  const rect = furnDrag.canvas.getBoundingClientRect();
+  furnDrag.item.x = Math.min(96, Math.max(4, (e.clientX - rect.left) / rect.width * 100));
+  furnDrag.item.y = Math.min(96, Math.max(4, (e.clientY - rect.top) / rect.height * 100));
+  renderFurnitureCanvas();
+});
+window.addEventListener("mouseup", () => {
+  if(furnDrag){ renderRoomFurnitureMini(furnitureModalRoom); furnDrag = null; }
+});
+window.addEventListener("touchmove", e => {
+  if(!furnDrag) return;
+  const t = e.touches[0];
+  const rect = furnDrag.canvas.getBoundingClientRect();
+  furnDrag.item.x = Math.min(96, Math.max(4, (t.clientX - rect.left) / rect.width * 100));
+  furnDrag.item.y = Math.min(96, Math.max(4, (t.clientY - rect.top) / rect.height * 100));
+  renderFurnitureCanvas();
+}, {passive:true});
+window.addEventListener("touchend", () => {
+  if(furnDrag){ renderRoomFurnitureMini(furnitureModalRoom); furnDrag = null; }
+});
+
+function renderRoomFurnitureMini(entry){
+  const layer = entry.els.root.querySelector(".furniture-layer");
+  if(!layer) return;
+  layer.innerHTML = "";
+  (entry.furniture || []).forEach(item => {
+    const span = document.createElement("span");
+    span.className = "furniture-icon-mini";
+    span.style.left = item.x + "%";
+    span.style.top = item.y + "%";
+    span.textContent = furnitureIcon(item.type);
+    layer.appendChild(span);
+  });
 }
 
 /* ================= MAP EDITOR ("Criar meu mapa") ================= */
@@ -240,7 +346,7 @@ function confirmRoomForm(){
   const corner = document.getElementById("rfCorner").value;
   const notch = parseInt(document.getElementById("rfNotch").value, 10);
   const radius = parseInt(document.getElementById("rfRadius").value, 10);
-  if(pendingBox) addCustomRoom({ name, cap, ap, shape, corner, notch, radius, ...pendingBox });
+  if(pendingBox) addCustomRoom({ name, cap, ap, shape, corner, notch, radius, furniture: [], ...pendingBox });
   pendingBox = null;
   document.getElementById("modalOverlay").style.display = "none";
 }
@@ -255,7 +361,9 @@ function addCustomRoom(data){
   root.style.height = data.h + "%";
   root.dataset.status = "good";
   root.innerHTML = `
+    <div class="furniture-layer"></div>
     <button class="room-delete" title="Remover sala">×</button>
+    <button class="room-furnish-btn" title="Mobiliar">🪑</button>
     <div class="room-top">
       <div><div class="room-name">${escapeHtml(data.name)}</div><div class="room-sub">Cap. ${data.cap} · ${escapeHtml(data.ap)}</div></div>
       <div class="status-pill">normal</div>
@@ -272,6 +380,7 @@ function addCustomRoom(data){
     id, name: data.name, cap: data.cap, ap: data.ap,
     x: data.x, y: data.y, w: data.w, h: data.h,
     shape: data.shape, corner: data.corner, notch: data.notch, radius: data.radius,
+    furniture: data.furniture || [],
     count: Math.floor(Math.random() * data.cap * 0.6),
     dotsArr: [],
     els: {
@@ -285,6 +394,8 @@ function addCustomRoom(data){
 
   root.querySelector(".room-delete").addEventListener("click", (ev) => { ev.stopPropagation(); removeCustomRoom(id); });
   root.querySelector(".room-delete").addEventListener("mousedown", ev => ev.stopPropagation());
+  root.querySelector(".room-furnish-btn").addEventListener("click", ev => { ev.stopPropagation(); openFurnitureModal(entry); });
+  root.querySelector(".room-furnish-btn").addEventListener("mousedown", ev => ev.stopPropagation());
   root.querySelector(".resize-handle").addEventListener("mousedown", ev => { ev.stopPropagation(); startResize(entry, ev.clientX, ev.clientY); });
   root.querySelector(".resize-handle").addEventListener("touchstart", ev => { ev.stopPropagation(); const t=ev.touches[0]; startResize(entry, t.clientX, t.clientY); ev.preventDefault(); }, {passive:false});
   root.addEventListener("mousedown", ev => { if(ev.target === root || ev.target.closest(".room-top") || ev.target.closest(".room-count")) startMove(entry, ev.clientX, ev.clientY); });
@@ -293,6 +404,7 @@ function addCustomRoom(data){
   renderRoomList();
   updateEmptyNote();
   customRoomTickOne(entry);
+  renderRoomFurnitureMini(entry);
 }
 
 function removeCustomRoom(id){
@@ -325,7 +437,7 @@ function updateEmptyNote(){ emptyNote.style.display = customRooms.length ? "none
 async function saveCustomMap(){
   const statusEl = document.getElementById("saveStatus");
   try{
-    const payload = customRooms.map(r => ({ name:r.name, cap:r.cap, ap:r.ap, x:r.x, y:r.y, w:r.w, h:r.h, shape:r.shape, corner:r.corner, notch:r.notch, radius:r.radius }));
+    const payload = customRooms.map(r => ({ name:r.name, cap:r.cap, ap:r.ap, x:r.x, y:r.y, w:r.w, h:r.h, shape:r.shape, corner:r.corner, notch:r.notch, radius:r.radius, furniture:r.furniture || [] }));
     localStorage.setItem("custom-map-rooms:" + currentAdmin.schoolId, JSON.stringify(payload));
     statusEl.textContent = "Salvo ✓ — vai continuar aqui da próxima vez";
   }catch(err){ statusEl.textContent = "Não consegui salvar agora"; }
@@ -344,7 +456,7 @@ let liveRooms = [];
 async function publishMap(){
   const statusEl = document.getElementById("publishStatus") || document.getElementById("saveStatus");
   try{
-    const payload = customRooms.map(r => ({ name:r.name, cap:r.cap, ap:r.ap, x:r.x, y:r.y, w:r.w, h:r.h, shape:r.shape, corner:r.corner, notch:r.notch, radius:r.radius }));
+    const payload = customRooms.map(r => ({ name:r.name, cap:r.cap, ap:r.ap, x:r.x, y:r.y, w:r.w, h:r.h, shape:r.shape, corner:r.corner, notch:r.notch, radius:r.radius, furniture:r.furniture || [] }));
     localStorage.setItem("published-map:" + currentAdmin.schoolId, JSON.stringify(payload));
     statusEl.textContent = "Publicado ✓ — já está no Mapa ao vivo";
     renderLiveCustomMap();
@@ -377,6 +489,7 @@ function renderLiveCustomMap(){
     root.style.height = d.h + "%";
     root.dataset.status = "good";
     root.innerHTML = `
+      <div class="furniture-layer"></div>
       <div class="room-top">
         <div><div class="room-name">${escapeHtml(d.name)}</div><div class="room-sub">${escapeHtml(d.ap)}</div></div>
         <div class="status-pill">normal</div>
@@ -390,6 +503,7 @@ function renderLiveCustomMap(){
 
     const entry = {
       id: "live" + i, name: d.name, cap: d.cap, ap: d.ap,
+      furniture: d.furniture || [],
       count: Math.floor(Math.random() * d.cap * 0.6),
       dotsArr: [],
       els: {
@@ -408,6 +522,7 @@ function renderLiveCustomMap(){
     });
     liveRooms.push(entry);
     customRoomTickOne(entry);
+    renderRoomFurnitureMini(entry);
   });
 
   renderHomeStats();
