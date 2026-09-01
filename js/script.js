@@ -117,6 +117,10 @@ const FURNITURE_TYPES = [
   { type:"bench",    label:"Bancada" },
   { type:"plant",    label:"Planta" },
   { type:"board",    label:"Quadro" },
+  { type:"cabinet",  label:"Armário" },
+  { type:"drawer",   label:"Gaveteiro" },
+  { type:"table",    label:"Mesa" },
+  { type:"door",     label:"Porta" },
 ];
 
 function furnitureSvg(type, size){
@@ -127,105 +131,139 @@ function furnitureSvg(type, size){
     bench: '<rect x="2" y="9" width="20" height="7" rx="1"/><circle cx="7" cy="7" r="1.4"/><circle cx="12" cy="6.5" r="1.4"/><circle cx="17" cy="7" r="1.4"/>',
     plant: '<circle cx="12" cy="15" r="4"/><path d="M12 11 C 10 8, 8 8, 8 5"/><path d="M12 11 C 12 7, 12 7, 12 4"/><path d="M12 11 C 14 8, 16 8, 16 5"/>',
     board: '<rect x="3" y="5" width="18" height="11" rx="1"/><line x1="3" y1="16" x2="21" y2="16" stroke-width="2.4"/>',
+    cabinet: '<rect x="4" y="3" width="16" height="18" rx="1"/><line x1="12" y1="3" x2="12" y2="21"/><circle cx="9" cy="12" r="0.8"/><circle cx="15" cy="12" r="0.8"/>',
+    drawer: '<rect x="4" y="3" width="16" height="18" rx="1"/><line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/><line x1="10" y1="6" x2="14" y2="6"/><line x1="10" y1="12" x2="14" y2="12"/><line x1="10" y1="18" x2="14" y2="18"/>',
+    table: '<rect x="3" y="8" width="18" height="8" rx="1"/><line x1="5" y1="16" x2="5" y2="20"/><line x1="19" y1="16" x2="19" y2="20"/>',
+    door: '<line x1="5" y1="3" x2="5" y2="21" stroke-width="2.4"/><path d="M5 3 A18 18 0 0 1 21 17"/>',
   };
   const inner = paths[type] || '<rect x="6" y="6" width="12" height="12" rx="1"/>';
   return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${inner}</svg>`;
 }
 
-let furnitureModalRoom = null;
-let furnDrag = null;
+let furnishModeEntry = null;
+let furnitureDragState = null;
 
-function openFurnitureModal(entry){
-  furnitureModalRoom = entry;
-  if(!furnitureModalRoom.furniture) furnitureModalRoom.furniture = [];
-  document.getElementById("furnModalTitle").textContent = "Mobiliar — " + entry.name;
+function toggleFurnishMode(entry){
+  if(furnishModeEntry === entry){ exitFurnishMode(); return; }
+  if(furnishModeEntry) exitFurnishMode();
+  furnishModeEntry = entry;
+  entry.els.root.classList.add("furnish-mode");
+  document.getElementById("furnitureToolbar").classList.add("active");
+  renderRoomFurnitureMini(entry);
+}
+function exitFurnishMode(){
+  if(furnishModeEntry) furnishModeEntry.els.root.classList.remove("furnish-mode");
+  closeFurniturePopover();
+  furnishModeEntry = null;
+  document.getElementById("furnitureToolbar").classList.remove("active");
+}
 
-  const palette = document.getElementById("furniturePalette");
-  palette.innerHTML = "";
+function addFurnitureToActiveRoom(type){
+  if(!furnishModeEntry) return;
+  if(!furnishModeEntry.furniture) furnishModeEntry.furniture = [];
+  furnishModeEntry.furniture.push({ type, x: 50, y: 50, size: 20 });
+  renderRoomFurnitureMini(furnishModeEntry);
+}
+
+function buildFurnitureToolbar(){
+  const bar = document.getElementById("furnitureToolbar");
+  bar.innerHTML = "";
   FURNITURE_TYPES.forEach(f => {
     const btn = document.createElement("button");
-    btn.innerHTML = furnitureSvg(f.type, 20) + `<span class="lbl">${f.label}</span>`;
-    btn.onclick = () => addFurniture(f.type);
-    palette.appendChild(btn);
+    btn.innerHTML = furnitureSvg(f.type, 18) + `<span class="lbl">${f.label}</span>`;
+    btn.onclick = () => addFurnitureToActiveRoom(f.type);
+    bar.appendChild(btn);
   });
-
-  renderFurnitureCanvas();
-  document.getElementById("furnitureModalOverlay").style.display = "flex";
+  const exitBtn = document.createElement("button");
+  exitBtn.className = "exit-btn";
+  exitBtn.textContent = "Sair do modo mobília";
+  exitBtn.onclick = exitFurnishMode;
+  bar.appendChild(exitBtn);
 }
-function closeFurnitureModal(){
-  document.getElementById("furnitureModalOverlay").style.display = "none";
-  furnitureModalRoom = null;
-}
-
-function addFurniture(type){
-  furnitureModalRoom.furniture.push({ type, x: 40 + Math.random()*20, y: 40 + Math.random()*20 });
-  renderFurnitureCanvas();
-  renderRoomFurnitureMini(furnitureModalRoom);
-}
-
-function renderFurnitureCanvas(){
-  const canvas = document.getElementById("furnitureCanvas");
-  canvas.innerHTML = "";
-  const list = furnitureModalRoom.furniture || [];
-  list.forEach((item, idx) => {
-    const el = document.createElement("div");
-    el.className = "furniture-item";
-    el.style.left = item.x + "%";
-    el.style.top = item.y + "%";
-    el.innerHTML = furnitureSvg(item.type, 30);
-
-    const del = document.createElement("div");
-    del.className = "fi-del";
-    del.textContent = "×";
-    del.onclick = (ev) => {
-      ev.stopPropagation();
-      list.splice(idx, 1);
-      renderFurnitureCanvas();
-      renderRoomFurnitureMini(furnitureModalRoom);
-    };
-    el.appendChild(del);
-
-    el.addEventListener("mousedown", ev => { ev.stopPropagation(); furnDrag = { item, canvas }; });
-    el.addEventListener("touchstart", ev => { ev.stopPropagation(); furnDrag = { item, canvas }; }, {passive:true});
-    canvas.appendChild(el);
-  });
-}
-
-window.addEventListener("mousemove", e => {
-  if(!furnDrag) return;
-  const rect = furnDrag.canvas.getBoundingClientRect();
-  furnDrag.item.x = Math.min(96, Math.max(4, (e.clientX - rect.left) / rect.width * 100));
-  furnDrag.item.y = Math.min(96, Math.max(4, (e.clientY - rect.top) / rect.height * 100));
-  renderFurnitureCanvas();
-});
-window.addEventListener("mouseup", () => {
-  if(furnDrag){ renderRoomFurnitureMini(furnitureModalRoom); furnDrag = null; }
-});
-window.addEventListener("touchmove", e => {
-  if(!furnDrag) return;
-  const t = e.touches[0];
-  const rect = furnDrag.canvas.getBoundingClientRect();
-  furnDrag.item.x = Math.min(96, Math.max(4, (t.clientX - rect.left) / rect.width * 100));
-  furnDrag.item.y = Math.min(96, Math.max(4, (t.clientY - rect.top) / rect.height * 100));
-  renderFurnitureCanvas();
-}, {passive:true});
-window.addEventListener("touchend", () => {
-  if(furnDrag){ renderRoomFurnitureMini(furnitureModalRoom); furnDrag = null; }
-});
 
 function renderRoomFurnitureMini(entry){
   const layer = entry.els.root.querySelector(".furniture-layer");
   if(!layer) return;
   layer.innerHTML = "";
-  (entry.furniture || []).forEach(item => {
+  (entry.furniture || []).forEach((item, idx) => {
     const span = document.createElement("span");
     span.className = "furniture-icon-mini";
     span.style.left = item.x + "%";
     span.style.top = item.y + "%";
-    span.innerHTML = furnitureSvg(item.type, 12);
+    span.innerHTML = furnitureSvg(item.type, item.size || 20);
+
+    span.addEventListener("mousedown", ev => {
+      if(furnishModeEntry !== entry) return;
+      ev.stopPropagation();
+      furnitureDragState = { entry, item, layer };
+    });
+    span.addEventListener("touchstart", ev => {
+      if(furnishModeEntry !== entry) return;
+      ev.stopPropagation();
+      furnitureDragState = { entry, item, layer };
+    }, {passive:true});
+    span.addEventListener("click", ev => {
+      if(furnishModeEntry !== entry) return;
+      ev.stopPropagation();
+      openFurniturePopover(entry, item, idx, span);
+    });
+
     layer.appendChild(span);
   });
 }
+
+window.addEventListener("mousemove", e => {
+  if(!furnitureDragState) return;
+  const rect = furnitureDragState.layer.getBoundingClientRect();
+  furnitureDragState.item.x = Math.min(96, Math.max(4, (e.clientX - rect.left) / rect.width * 100));
+  furnitureDragState.item.y = Math.min(96, Math.max(4, (e.clientY - rect.top) / rect.height * 100));
+  renderRoomFurnitureMini(furnitureDragState.entry);
+});
+window.addEventListener("mouseup", () => { furnitureDragState = null; });
+window.addEventListener("touchmove", e => {
+  if(!furnitureDragState) return;
+  const t = e.touches[0];
+  const rect = furnitureDragState.layer.getBoundingClientRect();
+  furnitureDragState.item.x = Math.min(96, Math.max(4, (t.clientX - rect.left) / rect.width * 100));
+  furnitureDragState.item.y = Math.min(96, Math.max(4, (t.clientY - rect.top) / rect.height * 100));
+  renderRoomFurnitureMini(furnitureDragState.entry);
+}, {passive:true});
+window.addEventListener("touchend", () => { furnitureDragState = null; });
+
+function openFurniturePopover(entry, item, idx, iconEl){
+  closeFurniturePopover();
+  const pop = document.createElement("div");
+  pop.className = "furniture-popover";
+  pop.id = "activeFurniturePopover";
+  pop.innerHTML = `<input type="range" min="10" max="50" value="${item.size || 20}"><button class="fp-del">×</button>`;
+  const rect = iconEl.getBoundingClientRect();
+  pop.style.left = (rect.left + window.scrollX) + "px";
+  pop.style.top = (rect.bottom + window.scrollY + 6) + "px";
+  document.body.appendChild(pop);
+
+  pop.querySelector("input").addEventListener("input", ev => {
+    item.size = parseInt(ev.target.value, 10);
+    renderRoomFurnitureMini(entry);
+  });
+  pop.querySelector(".fp-del").addEventListener("click", (ev) => {
+    ev.stopPropagation();
+    entry.furniture.splice(idx, 1);
+    renderRoomFurnitureMini(entry);
+    closeFurniturePopover();
+  });
+}
+function closeFurniturePopover(){
+  const existing = document.getElementById("activeFurniturePopover");
+  if(existing) existing.remove();
+}
+document.addEventListener("click", (ev) => {
+  const pop = document.getElementById("activeFurniturePopover");
+  if(pop && !pop.contains(ev.target) && !ev.target.closest(".furniture-icon-mini")){
+    closeFurniturePopover();
+  }
+});
+
+buildFurnitureToolbar();
 
 /* ================= MAP EDITOR ("Criar meu mapa") ================= */
 const customRooms = [];
@@ -308,7 +346,7 @@ function handlePointerUp(clientX, clientY){
   activeOp = null;
 }
 
-editorCanvas.addEventListener("mousedown", e => { if(e.target === editorCanvas) startDraw(e.clientX, e.clientY); });
+editorCanvas.addEventListener("mousedown", e => { if(e.target === editorCanvas){ if(furnishModeEntry){ exitFurnishMode(); return; } startDraw(e.clientX, e.clientY); } });
 window.addEventListener("mousemove", e => handlePointerMove(e.clientX, e.clientY));
 window.addEventListener("mouseup", e => handlePointerUp(e.clientX, e.clientY));
 editorCanvas.addEventListener("touchstart", e => { if(e.target === editorCanvas){ const t=e.touches[0]; startDraw(t.clientX, t.clientY); e.preventDefault(); } }, {passive:false});
@@ -406,11 +444,11 @@ function addCustomRoom(data){
 
   root.querySelector(".room-delete").addEventListener("click", (ev) => { ev.stopPropagation(); removeCustomRoom(id); });
   root.querySelector(".room-delete").addEventListener("mousedown", ev => ev.stopPropagation());
-  root.querySelector(".room-furnish-btn").addEventListener("click", ev => { ev.stopPropagation(); openFurnitureModal(entry); });
+  root.querySelector(".room-furnish-btn").addEventListener("click", ev => { ev.stopPropagation(); toggleFurnishMode(entry); });
   root.querySelector(".room-furnish-btn").addEventListener("mousedown", ev => ev.stopPropagation());
   root.querySelector(".resize-handle").addEventListener("mousedown", ev => { ev.stopPropagation(); startResize(entry, ev.clientX, ev.clientY); });
   root.querySelector(".resize-handle").addEventListener("touchstart", ev => { ev.stopPropagation(); const t=ev.touches[0]; startResize(entry, t.clientX, t.clientY); ev.preventDefault(); }, {passive:false});
-  root.addEventListener("mousedown", ev => { if(ev.target === root || ev.target.closest(".room-top") || ev.target.closest(".room-count")) startMove(entry, ev.clientX, ev.clientY); });
+  root.addEventListener("mousedown", ev => { if(furnishModeEntry) return; if(ev.target === root || ev.target.closest(".room-top") || ev.target.closest(".room-count")) startMove(entry, ev.clientX, ev.clientY); });
 
   customRooms.push(entry);
   renderRoomList();

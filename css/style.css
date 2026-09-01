@@ -1158,65 +1158,130 @@ footer.app-footer {
     justify-content: center;
     z-index: 3;
 } 
-    
-.furniture-icon-mini{ 
-    color: var(--wall); 
-}
-    
-.furniture-item{ 
-    color: var(--wall); 
-}
-    
-.furniture-palette button{ 
-    color: var(--wall); 
+
+.furniture-layer {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
 }
 
-.furniture-palette button .lbl {
+.furniture-icon-mini {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    color: var(--wall);
+    pointer-events: none;
+}
+
+.room.furnish-mode {
+    outline: 2px dashed var(--ap);
+    outline-offset: 2px;
+    z-index: 5;
+}
+
+.room.furnish-mode .furniture-icon-mini {
+    pointer-events: auto;
+    cursor: grab;
+}
+
+.room.furnish-mode .furniture-icon-mini:active {
+    cursor: grabbing;
+}
+
+.furniture-icon-mini.selected {
+    outline: 1.5px dashed var(--ap);
+    border-radius: 4px;
+}
+
+.room-furnish-btn {
+    position: absolute;
+    bottom: 14px;
+    left: 4px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: rgba(0, 136, 160, .15);
+    color: var(--ap);
+    border: 1px solid rgba(0, 136, 160, .4);
+    font-size: 10px;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 3;
+}
+
+.furniture-toolbar {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    background: var(--panel-2);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 10px 12px;
+    margin-bottom: 14px;
+}
+
+.furniture-toolbar.active {
+    display: flex;
+}
+
+.furniture-toolbar button {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 6px 8px;
+    cursor: pointer;
+    color: var(--wall);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+
+.furniture-toolbar button .lbl {
     font-size: 9px;
     color: var(--text-dim);
     font-family: 'Inter', sans-serif;
 }
 
-.furniture-canvas-outer {
-    border: 1px dashed var(--line);
-    border-radius: 10px;
-    overflow: hidden;
-    margin-bottom: 16px;
-}
-
-.furniture-canvas {
-    position: relative;
-    width: 100%;
-    height: 220px;
-    background-color: var(--blueprint-fill);
-    background-image: linear-gradient(var(--grid-line) 1px, transparent 1px), linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
-    background-size: 18px 18px;
-}
-
-.furniture-item {
-    position: absolute;
-    font-size: 26px;
-    transform: translate(-50%, -50%);
-    cursor: grab;
-    user-select: none;
-    touch-action: none;
-}
-
-.furniture-item:active {
-    cursor: grabbing;
-}
-
-.furniture-item .fi-del {
-    position: absolute;
-    top: -8px;
-    right: -10px;
-    width: 15px;
-    height: 15px;
-    border-radius: 50%;
+.furniture-toolbar .exit-btn {
+    margin-left: auto;
     background: var(--bad);
     color: #fff;
-    font-size: 9px;
-    line-height: 15px;
-    text-align: center;
+    border: none;
+    border-radius: 8px;
+    padding: 6px 10px;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.furniture-popover {
+    position: absolute;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    z-index: 60;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, .15);
+}
+
+.furniture-popover input[type=range] {
+    width: 90px;
+}
+
+.furniture-popover .fp-del {
+    background: var(--bad);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    width: 22px;
+    height: 22px;
+    font-size: 12px;
     cursor: pointer;
 }
