@@ -1285,3 +1285,48 @@ footer.app-footer {
     font-size: 12px;
     cursor: pointer;
 }
+
+.floor-tabs {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+}
+
+.floor-tab-btn {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 7px 14px;
+    border-radius: 20px;
+    background: var(--panel-2);
+    border: 1px solid var(--line);
+    color: var(--text-dim);
+    cursor: pointer;
+}
+
+.floor-tab-btn.active {
+    background: rgba(0, 136, 160, .14);
+    border-color: rgba(0, 136, 160, .4);
+    color: var(--brand-blue);
+}
+
+.floor-tab-add {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    padding: 7px 12px;
+    border-radius: 20px;
+    background: transparent;
+    border: 1px dashed var(--line);
+    color: var(--text-faint);
+    cursor: pointer;
+}
+
+.room.kind-corridor {
+    background: repeating-linear-gradient(45deg, rgba(13, 44, 74, 0.05), rgba(13, 44, 74, 0.05) 6px, transparent 6px, transparent 12px);
+    border: 1.5px dashed var(--text-faint);
+}
+
+.room.kind-corridor .room-name {
+    color: var(--text-dim);
+}

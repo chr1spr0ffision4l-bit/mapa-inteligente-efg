@@ -107,6 +107,9 @@
                         <h2>Mapa Publicado</h2>
                         <div class="clock" id="clock">--:--:--</div>
                     </div>
+
+                    <div class="floor-tabs" id="floorTabsLive"></div>
+
                     <div class="editor-canvas-outer">
                         <div class="editor-canvas" id="liveStage" style="cursor:default;">
                             <div class="editor-empty-note" id="liveEmptyNote">Nenhum mapa publicado ainda. Vá em "Criar meu
@@ -144,6 +147,8 @@
                 </div>
 
                 <div class="furniture-toolbar" id="furnitureToolbar"></div>
+
+                <div class="floor-tabs" id="floorTabsEditor"></div>
 
                 <div class="editor-canvas-outer">
                     <div class="editor-canvas" id="editorCanvas">
@@ -236,16 +241,24 @@
 
     <div class="modal-overlay" id="modalOverlay">
         <div class="room-form-card">
+            <label>Tipo de área
+                <select id="rfKind" onchange="toggleKindFields()">
+                    <option value="room">Sala (com ocupação)</option>
+                    <option value="corridor">Corredor / área de passagem</option>
+                </select>
+            </label>
             <h4>Nova sala</h4>
             <label>Nome da sala
                 <input id="rfName" type="text" placeholder="Ex: Sala 03">
             </label>
+        <div id="rfRoomFields">
             <label>Capacidade (nº de pessoas)
                 <input id="rfCap" type="number" value="30" min="1" max="200">
             </label>
             <label>Ponto de acesso Wi-Fi (opcional)
                 <input id="rfAp" type="text" placeholder="Ex: AP-05">
             </label>
+        </div>
             <label>Formato
                 <select id="rfShape" onchange="toggleShapeFields()">
                     <option value="rect">Retângulo</option>
