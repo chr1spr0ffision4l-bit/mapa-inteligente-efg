@@ -111,14 +111,26 @@ function customRoomTickOne(r){
 
 /* ================= MOBÍLIA DAS SALAS ================= */
 const FURNITURE_TYPES = [
-  { type:"chair",    icon:"🪑", label:"Cadeira" },
-  { type:"computer", icon:"💻", label:"Computador" },
-  { type:"shelf",    icon:"📚", label:"Estante" },
-  { type:"bench",    icon:"🔬", label:"Bancada" },
-  { type:"plant",    icon:"🌿", label:"Planta" },
-  { type:"board",    icon:"🖼️", label:"Quadro" },
+  { type:"chair",    label:"Cadeira" },
+  { type:"computer", label:"Computador" },
+  { type:"shelf",    label:"Estante" },
+  { type:"bench",    label:"Bancada" },
+  { type:"plant",    label:"Planta" },
+  { type:"board",    label:"Quadro" },
 ];
-function furnitureIcon(type){ const f = FURNITURE_TYPES.find(f => f.type === type); return f ? f.icon : "❓"; }
+
+function furnitureSvg(type, size){
+  const paths = {
+    chair: '<rect x="6" y="8" width="12" height="10" rx="1"/><line x1="6" y1="8" x2="18" y2="8" stroke-width="3"/>',
+    computer: '<rect x="3" y="13" width="18" height="6" rx="1"/><rect x="8" y="4" width="8" height="6" rx="1"/><line x1="12" y1="10" x2="12" y2="13"/>',
+    shelf: '<rect x="4" y="3" width="16" height="18" rx="1"/><line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="14" x2="20" y2="14"/>',
+    bench: '<rect x="2" y="9" width="20" height="7" rx="1"/><circle cx="7" cy="7" r="1.4"/><circle cx="12" cy="6.5" r="1.4"/><circle cx="17" cy="7" r="1.4"/>',
+    plant: '<circle cx="12" cy="15" r="4"/><path d="M12 11 C 10 8, 8 8, 8 5"/><path d="M12 11 C 12 7, 12 7, 12 4"/><path d="M12 11 C 14 8, 16 8, 16 5"/>',
+    board: '<rect x="3" y="5" width="18" height="11" rx="1"/><line x1="3" y1="16" x2="21" y2="16" stroke-width="2.4"/>',
+  };
+  const inner = paths[type] || '<rect x="6" y="6" width="12" height="12" rx="1"/>';
+  return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${inner}</svg>`;
+}
 
 let furnitureModalRoom = null;
 let furnDrag = null;
@@ -132,7 +144,7 @@ function openFurnitureModal(entry){
   palette.innerHTML = "";
   FURNITURE_TYPES.forEach(f => {
     const btn = document.createElement("button");
-    btn.innerHTML = f.icon + `<span class="lbl">${f.label}</span>`;
+    btn.innerHTML = furnitureSvg(f.type, 20) + `<span class="lbl">${f.label}</span>`;
     btn.onclick = () => addFurniture(f.type);
     palette.appendChild(btn);
   });
@@ -160,7 +172,7 @@ function renderFurnitureCanvas(){
     el.className = "furniture-item";
     el.style.left = item.x + "%";
     el.style.top = item.y + "%";
-    el.textContent = furnitureIcon(item.type);
+    el.innerHTML = furnitureSvg(item.type, 30);
 
     const del = document.createElement("div");
     del.className = "fi-del";
@@ -210,7 +222,7 @@ function renderRoomFurnitureMini(entry){
     span.className = "furniture-icon-mini";
     span.style.left = item.x + "%";
     span.style.top = item.y + "%";
-    span.textContent = furnitureIcon(item.type);
+    span.innerHTML = furnitureSvg(item.type, 12);
     layer.appendChild(span);
   });
 }
