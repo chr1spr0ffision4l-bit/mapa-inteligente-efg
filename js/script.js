@@ -411,6 +411,7 @@ function openRoomForm(){
 }
 function cancelRoomForm(){ pendingBox = null; document.getElementById("modalOverlay").style.display = "none"; }
 function confirmRoomForm(){
+  const type = document.getElementById("rfType").value;
   const name = document.getElementById("rfName").value.trim() || ("Sala " + (customRooms.length + 1));
   const cap = Math.max(1, parseInt(document.getElementById("rfCap").value, 10) || 30);
   const ap = document.getElementById("rfAp").value.trim() || "—";
@@ -421,7 +422,6 @@ function confirmRoomForm(){
   if(pendingBox) addCustomRoom({ type, name, cap, ap, shape, corner, notch, radius, furniture: [], ...pendingBox });
   pendingBox = null;
   document.getElementById("modalOverlay").style.display = "none";
-  const type = document.getElementById("rfType").value;
 }
 
 function addCustomRoom(data){
