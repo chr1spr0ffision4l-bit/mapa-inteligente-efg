@@ -275,6 +275,27 @@ const emptyNote = document.getElementById("editorEmptyNote");
 
 let activeOp = null;
 
+/* ---------- andares ---------- */
+let currentFloor = "1";
+const customRoomsByFloor = { "1": [], "2": [] };
+
+function serializeRoom(r){
+  return { type:r.type||"room", name:r.name, cap:r.cap, ap:r.ap, x:r.x, y:r.y, w:r.w, h:r.h, shape:r.shape, corner:r.corner, notch:r.notch, radius:r.radius, furniture:r.furniture || [] };
+}
+function syncActiveFloorToStore(){
+  customRoomsByFloor[currentFloor] = customRooms.map(serializeRoom);
+}
+function switchFloor(floorId){
+  syncActiveFloorToStore();
+  [...customRooms].forEach(r => r.els.root.remove());
+  customRooms.length = 0;
+  currentFloor = floorId;
+  document.querySelectorAll(".floor-tab").forEach(b => b.classList.toggle("active", b.dataset.floor === floorId));
+  (customRoomsByFloor[floorId] || []).forEach(data => addCustomRoom(data));
+  renderRoomList();
+  updateEmptyNote();
+}
+
 function pctFromEvent(clientX, clientY){
   const rect = editorCanvas.getBoundingClientRect();
   const x = Math.min(100, Math.max(0, (clientX - rect.left) / rect.width * 100));
@@ -386,6 +407,7 @@ function openRoomForm(){
   toggleShapeFields();
   document.getElementById("modalOverlay").style.display = "flex";
   setTimeout(() => document.getElementById("rfName").focus(), 50);
+  document.getElementById("rfType").value = "room";
 }
 function cancelRoomForm(){ pendingBox = null; document.getElementById("modalOverlay").style.display = "none"; }
 function confirmRoomForm(){
@@ -396,15 +418,16 @@ function confirmRoomForm(){
   const corner = document.getElementById("rfCorner").value;
   const notch = parseInt(document.getElementById("rfNotch").value, 10);
   const radius = parseInt(document.getElementById("rfRadius").value, 10);
-  if(pendingBox) addCustomRoom({ name, cap, ap, shape, corner, notch, radius, furniture: [], ...pendingBox });
+  if(pendingBox) addCustomRoom({ type, name, cap, ap, shape, corner, notch, radius, furniture: [], ...pendingBox });
   pendingBox = null;
   document.getElementById("modalOverlay").style.display = "none";
+  const type = document.getElementById("rfType").value;
 }
 
 function addCustomRoom(data){
   const id = "custom" + (customIdCounter++);
   const root = document.createElement("div");
-  root.className = "room room-move-handle";
+  root.className = "room room-move-handle" + (data.type === "corridor" ? " type-corridor" : "");
   root.style.left = data.x + "%";
   root.style.top = data.y + "%";
   root.style.width = data.w + "%";
@@ -427,7 +450,7 @@ function addCustomRoom(data){
   applyShapeStyle(root, data);
 
   const entry = {
-    id, name: data.name, cap: data.cap, ap: data.ap,
+    id, name: data.name, cap: data.cap, ap: data.ap, type: data.type || "room", 
     x: data.x, y: data.y, w: data.w, h: data.h,
     shape: data.shape, corner: data.corner, notch: data.notch, radius: data.radius,
     furniture: data.furniture || [],
@@ -468,7 +491,7 @@ function removeCustomRoom(id){
 
 function clearCustomMap(){
   [...customRooms].forEach(r => removeCustomRoom(r.id));
-  localStorage.removeItem("custom-map-rooms:" + currentAdmin.schoolId);
+  customRoomsByFloor[currentFloor] = [];
 }
 
 function renderRoomList(){
@@ -485,18 +508,25 @@ function renderRoomList(){
 function updateEmptyNote(){ emptyNote.style.display = customRooms.length ? "none" : "flex"; }
 
 async function saveCustomMap(){
+  syncActiveFloorToStore();
   const statusEl = document.getElementById("saveStatus");
   try{
-    const payload = customRooms.map(r => ({ name:r.name, cap:r.cap, ap:r.ap, x:r.x, y:r.y, w:r.w, h:r.h, shape:r.shape, corner:r.corner, notch:r.notch, radius:r.radius, furniture:r.furniture || [] }));
-    localStorage.setItem("custom-map-rooms:" + currentAdmin.schoolId, JSON.stringify(payload));
+    localStorage.setItem("custom-map-rooms:" + currentAdmin.schoolId, JSON.stringify(customRoomsByFloor));
     statusEl.textContent = "Salvo ✓ — vai continuar aqui da próxima vez";
   }catch(err){ statusEl.textContent = "Não consegui salvar agora"; }
 }
 async function loadCustomMap(){
   try{
     const raw = localStorage.getItem("custom-map-rooms:" + currentAdmin.schoolId);
-    if(raw){ JSON.parse(raw).forEach(data => addCustomRoom(data)); }
+    if(raw){
+      const parsed = JSON.parse(raw);
+      if(Array.isArray(parsed)){ customRoomsByFloor["1"] = parsed; }
+      else { Object.assign(customRoomsByFloor, parsed); }
+    }
   }catch(err){ /* nada salvo ainda pra essa escola */ }
+  currentFloor = "1";
+  document.querySelectorAll(".floor-tab").forEach(b => b.classList.toggle("active", b.dataset.floor === currentFloor));
+  (customRoomsByFloor[currentFloor] || []).forEach(data => addCustomRoom(data));
   updateEmptyNote();
 }
 
@@ -504,21 +534,39 @@ async function loadCustomMap(){
 let liveRooms = [];
 
 async function publishMap(){
+  syncActiveFloorToStore();
   const statusEl = document.getElementById("publishStatus") || document.getElementById("saveStatus");
   try{
-    const payload = customRooms.map(r => ({ name:r.name, cap:r.cap, ap:r.ap, x:r.x, y:r.y, w:r.w, h:r.h, shape:r.shape, corner:r.corner, notch:r.notch, radius:r.radius, furniture:r.furniture || [] }));
-    localStorage.setItem("published-map:" + currentAdmin.schoolId, JSON.stringify(payload));
+    localStorage.setItem("published-map:" + currentAdmin.schoolId, JSON.stringify(customRoomsByFloor));
     statusEl.textContent = "Publicado ✓ — já está no Mapa ao vivo";
     renderLiveCustomMap();
   }catch(err){ statusEl.textContent = "Não consegui publicar agora"; }
 }
 
+let liveFloorData = {};
+let liveFloor = "1";
+
+function switchLiveFloor(floorId){
+  liveFloor = floorId;
+  document.querySelectorAll(".live-floor-tab").forEach(b => b.classList.toggle("active", b.dataset.floor === floorId));
+  renderLiveFloor();
+}
+
 function renderLiveCustomMap(){
   const raw = localStorage.getItem("published-map:" + currentAdmin.schoolId);
+  try{
+    const parsed = raw ? JSON.parse(raw) : {};
+    liveFloorData = Array.isArray(parsed) ? { "1": parsed } : parsed;
+  }catch(e){ liveFloorData = {}; }
+  liveFloor = "1";
+  document.querySelectorAll(".live-floor-tab").forEach(b => b.classList.toggle("active", b.dataset.floor === liveFloor));
+  renderLiveFloor();
+}
+
+function renderLiveFloor(){
   const liveStage = document.getElementById("liveStage");
   const emptyNoteLive = document.getElementById("liveEmptyNote");
-  let data = [];
-  try{ data = raw ? JSON.parse(raw) : []; }catch(e){ data = []; }
+  const data = liveFloorData[liveFloor] || [];
 
   liveStage.querySelectorAll(".room").forEach(el => el.remove());
   liveRooms = [];
@@ -532,7 +580,7 @@ function renderLiveCustomMap(){
 
   data.forEach((d, i) => {
     const root = document.createElement("div");
-    root.className = "room";
+    root.className = "room" + (d.type === "corridor" ? " type-corridor" : "");
     root.style.left = d.x + "%";
     root.style.top = d.y + "%";
     root.style.width = d.w + "%";
