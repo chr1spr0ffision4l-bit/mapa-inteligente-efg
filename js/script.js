@@ -379,6 +379,11 @@ function toggleShapeFields(){
   document.getElementById("rfLFields").style.display = isL ? "block" : "none";
 }
 
+function toggleRoomTypeFields(){
+  const isCorridor = document.getElementById("rfType").value === "corridor";
+  document.getElementById("rfRoomFields").style.display = isCorridor ? "none" : "block";
+}
+
 function applyShapeStyle(root, data){
   if(data.shape === "l"){
     const n = data.notch || 35;
@@ -408,13 +413,14 @@ function openRoomForm(){
   document.getElementById("modalOverlay").style.display = "flex";
   setTimeout(() => document.getElementById("rfName").focus(), 50);
   document.getElementById("rfType").value = "room";
+  toggleRoomTypeFields();
 }
 function cancelRoomForm(){ pendingBox = null; document.getElementById("modalOverlay").style.display = "none"; }
 function confirmRoomForm(){
   const type = document.getElementById("rfType").value;
   const name = document.getElementById("rfName").value.trim() || ("Sala " + (customRooms.length + 1));
-  const cap = Math.max(1, parseInt(document.getElementById("rfCap").value, 10) || 30);
-  const ap = document.getElementById("rfAp").value.trim() || "—";
+  const cap = type === "corridor" ? 60 : Math.max(1, parseInt(document.getElementById("rfCap").value, 10) || 30);
+  const ap = type === "corridor" ? "—" : (document.getElementById("rfAp").value.trim() || "—");
   const shape = document.getElementById("rfShape").value;
   const corner = document.getElementById("rfCorner").value;
   const notch = parseInt(document.getElementById("rfNotch").value, 10);
@@ -659,8 +665,35 @@ function tick(){
   renderHomeStats();
 }
 
+function buildFloorTabs(){
+  const floors = [{ id:"1", label:"1º Andar" }, { id:"2", label:"2º Andar" }];
+
+  const editorBar = document.getElementById("floorTabsEditor");
+  editorBar.innerHTML = "";
+  floors.forEach(f => {
+    const btn = document.createElement("button");
+    btn.className = "floor-tab" + (f.id === currentFloor ? " active" : "");
+    btn.dataset.floor = f.id;
+    btn.textContent = f.label;
+    btn.onclick = () => switchFloor(f.id);
+    editorBar.appendChild(btn);
+  });
+
+  const liveBar = document.getElementById("floorTabsLive");
+  liveBar.innerHTML = "";
+  floors.forEach(f => {
+    const btn = document.createElement("button");
+    btn.className = "live-floor-tab" + (f.id === liveFloor ? " active" : "");
+    btn.dataset.floor = f.id;
+    btn.textContent = f.label;
+    btn.onclick = () => switchLiveFloor(f.id);
+    liveBar.appendChild(btn);
+  });
+}
+
 /* ================= BOOT ================= */
 checkSession();
+buildFloorTabs();
 updateClock();
 setInterval(updateClock, 1000);
 setInterval(tick, 3000);

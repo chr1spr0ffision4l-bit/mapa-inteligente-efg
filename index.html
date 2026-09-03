@@ -33,273 +33,289 @@
             <button class="btn-primary login-btn" onclick="tryLogin()">Entrar</button>
         </div>
     </div>
-    
+
     <div id="appRoot" style="display:none;">
 
-    <div class="topbar">
-        <div class="topbar-brand">
-            <div class="topbar-logo"><img src="icons/logo-icon.png" alt="Logo EFG"
-                    style="width:100%; height:100%; object-fit:contain;"></div>
-            <div class="topbar-name">Mapa Inteligente<small>EFG Sarah Luisa Lemos Kunirtschek de Oliveira</small></div>
+        <div class="topbar">
+            <div class="topbar-brand">
+                <div class="topbar-logo"><img src="icons/logo-icon.png" alt="Logo EFG"
+                        style="width:100%; height:100%; object-fit:contain;"></div>
+                <div class="topbar-name">Mapa Inteligente<small>EFG Sarah Luisa Lemos Kunirtschek de Oliveira</small>
+                </div>
+            </div>
+            <div class="status-pill-top">🔧 Dados simulados</div>
         </div>
-        <div class="status-pill-top">🔧 Dados simulados</div>
-    </div>
 
-    <div class="wrap">
+        <div class="wrap">
 
-        <!-- ============ HOME ============ -->
-        <section class="screen active" id="screen-home">
-            <div class="hero">
-                <div class="hero-eyebrow"><span class="dot"></span> Protótipo em desenvolvimento</div>
-                <h1>Sistema Inteligente de Mapeamento e Ocupação Escolar</h1>
-                <p>Acompanhe em tempo real quantos dispositivos estão conectados em cada ambiente da escola, veja onde
-                    há mais gente e monte o mapa dos seus próprios espaços.</p>
-            </div>
-
-            <div class="home-stats">
-                <div class="home-stat total">
-                    <div class="num" id="statTotal">--</div>
-                    <div class="label">dispositivos conectados agora</div>
+            <!-- ============ HOME ============ -->
+            <section class="screen active" id="screen-home">
+                <div class="hero">
+                    <div class="hero-eyebrow"><span class="dot"></span> Protótipo em desenvolvimento</div>
+                    <h1>Sistema Inteligente de Mapeamento e Ocupação Escolar</h1>
+                    <p>Acompanhe em tempo real quantos dispositivos estão conectados em cada ambiente da escola, veja
+                        onde
+                        há mais gente e monte o mapa dos seus próprios espaços.</p>
                 </div>
-                <div class="home-stat alert">
-                    <div class="num" id="statAlert">--</div>
-                    <div class="label">ambientes lotados</div>
+
+                <div class="home-stats">
+                    <div class="home-stat total">
+                        <div class="num" id="statTotal">--</div>
+                        <div class="label">dispositivos conectados agora</div>
+                    </div>
+                    <div class="home-stat alert">
+                        <div class="num" id="statAlert">--</div>
+                        <div class="label">ambientes lotados</div>
+                    </div>
                 </div>
-            </div>
 
-            <div class="data-banner">
-                ⚠️ <span><b>Fonte de dados:</b> por enquanto os números são simulados. A integração com o Wi-Fi real da
-                    escola depende de autorização do TI/coordenação da EFG — acompanhe o status em
-                    <b>Configurações</b>.</span>
-            </div>
+                <div class="data-banner">
+                    ⚠️ <span><b>Fonte de dados:</b> por enquanto os números são simulados. A integração com o Wi-Fi real
+                        da
+                        escola depende de autorização do TI/coordenação da EFG — acompanhe o status em
+                        <b>Configurações</b>.</span>
+                </div>
 
-            <div class="shortcut-grid">
-                <button class="shortcut-card" onclick="showScreen('map')">
-                    <div class="ic">🗺️</div>
-                    <div class="t">Ver mapa ao vivo</div>
-                    <div class="d">Ocupação de cada sala, laboratório e biblioteca em tempo real</div>
-                </button>
-                <button class="shortcut-card" onclick="showScreen('editor')">
-                    <div class="ic">✏️</div>
-                    <div class="t">Criar meu mapa</div>
-                    <div class="d">Desenhe suas próprias salas e veja a simulação rodando nelas</div>
-                </button>
-                <button class="shortcut-card" onclick="showScreen('settings')">
-                    <div class="ic">⚙️</div>
-                    <div class="t">Configurações</div>
-                    <div class="d">Status da integração com o Wi-Fi e dados do app</div>
-                </button>
-            </div>
-        </section>
+                <div class="shortcut-grid">
+                    <button class="shortcut-card" onclick="showScreen('map')">
+                        <div class="ic">🗺️</div>
+                        <div class="t">Ver mapa ao vivo</div>
+                        <div class="d">Ocupação de cada sala, laboratório e biblioteca em tempo real</div>
+                    </button>
+                    <button class="shortcut-card" onclick="showScreen('editor')">
+                        <div class="ic">✏️</div>
+                        <div class="t">Criar meu mapa</div>
+                        <div class="d">Desenhe suas próprias salas e veja a simulação rodando nelas</div>
+                    </button>
+                    <button class="shortcut-card" onclick="showScreen('settings')">
+                        <div class="ic">⚙️</div>
+                        <div class="t">Configurações</div>
+                        <div class="d">Status da integração com o Wi-Fi e dados do app</div>
+                    </button>
+                </div>
+            </section>
 
-        <!-- ============ MAPA AO VIVO ============ -->
-        <section class="screen" id="screen-map">
-            <div class="legend">
-                <div class="item"><span class="sw" style="background:var(--good)"></span> Ocupação normal</div>
-                <div class="item"><span class="sw" style="background:var(--warn)"></span> Muita gente</div>
-                <div class="item"><span class="sw" style="background:var(--bad)"></span> Lotado</div>
-                <div class="item"><span class="sw" style="background:var(--ap)"></span> Ponto de acesso Wi-Fi</div>
-            </div>
-        
-            <div class="layout">
-                <div class="map-card">
-                    <div class="map-title">
-                        <h2>Mapa Publicado</h2>
-                        <div class="clock" id="clock">--:--:--</div>
+            <!-- ============ MAPA AO VIVO ============ -->
+            <section class="screen" id="screen-map">
+                <div class="legend">
+                    <div class="item"><span class="sw" style="background:var(--good)"></span> Ocupação normal</div>
+                    <div class="item"><span class="sw" style="background:var(--warn)"></span> Muita gente</div>
+                    <div class="item"><span class="sw" style="background:var(--bad)"></span> Lotado</div>
+                    <div class="item"><span class="sw" style="background:var(--ap)"></span> Ponto de acesso Wi-Fi</div>
+                </div>
+
+                <div class="layout">
+                    <div class="map-card">
+                        <div class="map-title">
+                            <h2>Mapa Publicado</h2>
+                            <div class="clock" id="clock">--:--:--</div>
+                        </div>
+
+                        <div class="floor-tabs" id="floorTabsLive"></div>
+
+                        <div class="editor-canvas-outer">
+                            <div class="editor-canvas" id="liveStage" style="cursor:default;">
+                                <div class="editor-empty-note" id="liveEmptyNote">Nenhum mapa publicado ainda. Vá em
+                                    "Criar meu
+                                    mapa", monte as salas e clique em "Publicar".</div>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="floor-tabs" id="floorTabsLive"></div>
+                    <div class="side" id="sidePanel">
+                        <h3>Detalhes do ambiente</h3>
+                        <div class="empty" id="sideEmpty">Toque em uma sala no mapa para ver detalhes.</div>
+                        <div id="sideContent" style="display:none;">
+                            <div class="detail-name" id="dName">—</div>
+                            <div class="detail-sub" id="dSub">—</div>
+                            <div class="detail-row"><span class="k">Dispositivos conectados</span><span class="v"
+                                    id="dCount">—</span></div>
+                            <div class="detail-row"><span class="k">Capacidade do ambiente</span><span class="v"
+                                    id="dCap">—</span>
+                            </div>
+                            <div class="detail-row"><span class="k">Ponto de acesso</span><span class="v"
+                                    id="dAp">—</span></div>
+                            <div class="detail-row"><span class="k">Última atualização</span><span class="v"
+                                    id="dTime">—</span>
+                            </div>
+                            <div class="insight" id="dInsight"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ============ CRIAR MEU MAPA ============ -->
+            <section class="screen" id="screen-editor">
+                <div class="map-card">
+                    <div class="editor-toolbar">
+                        <div class="editor-hint">Clique e arraste dentro do quadro pra desenhar uma sala. Solte pra dar
+                            nome
+                            e capacidade. Cada sala criada já entra na simulação de ocupação.</div>
+                        <button class="btn-ghost" onclick="clearCustomMap()">Limpar tudo</button>
+                    </div>
+
+                    <div class="furniture-toolbar" id="furnitureToolbar"></div>
+
+                    <div class="floor-tabs" id="floorTabsEditor"></div>
 
                     <div class="editor-canvas-outer">
-                        <div class="editor-canvas" id="liveStage" style="cursor:default;">
-                            <div class="editor-empty-note" id="liveEmptyNote">Nenhum mapa publicado ainda. Vá em "Criar meu
-                                mapa", monte as salas e clique em "Publicar".</div>
+                        <div class="editor-canvas" id="editorCanvas">
+                            <div class="editor-empty-note" id="editorEmptyNote">Arraste aqui pra desenhar sua primeira
+                                sala
+                                🏫</div>
+                            <div class="draft-rect" id="draftRect"></div>
+                        </div>
+                    </div>
+
+                    <div class="editor-room-list" id="editorRoomList"></div>
+
+                    <div class="editor-actions">
+                        <button class="btn-primary" onclick="saveCustomMap()">Salvar meu mapa</button>
+                        <button class="btn-primary" style="background: var(--brand-blue);"
+                            onclick="publishMap()">Publicar no mapa ao vivo</button>
+                        <span class="save-status" id="saveStatus"></span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ============ CONFIGURAÇÕES ============ -->
+            <section class="screen" id="screen-settings">
+                <div class="settings-section">
+                    <h3>Fonte de dados</h3>
+                    <div class="sub">De onde vêm os números de ocupação mostrados no mapa.</div>
+
+                    <div class="source-option selected">
+                        <div class="source-radio"></div>
+                        <div>
+                            <div class="t">Dados simulados (ativo)</div>
+                            <div class="d">Os números que você vê agora são gerados automaticamente pra testar o app,
+                                sem
+                                depender da rede da escola.</div>
+                        </div>
+                    </div>
+
+                    <div class="source-option disabled">
+                        <div class="source-radio"></div>
+                        <div>
+                            <div class="t">Wi-Fi real da EFG <span class="lock-tag">🔒 em breve</span></div>
+                            <div class="d">Vai usar os pontos de acesso da escola pra contar dispositivos por ambiente
+                                de
+                                verdade. Depende de autorização do TI/coordenação.</div>
                         </div>
                     </div>
                 </div>
-        
-                <div class="side" id="sidePanel">
-                    <h3>Detalhes do ambiente</h3>
-                    <div class="empty" id="sideEmpty">Toque em uma sala no mapa para ver detalhes.</div>
-                    <div id="sideContent" style="display:none;">
-                        <div class="detail-name" id="dName">—</div>
-                        <div class="detail-sub" id="dSub">—</div>
-                        <div class="detail-row"><span class="k">Dispositivos conectados</span><span class="v"
-                                id="dCount">—</span></div>
-                        <div class="detail-row"><span class="k">Capacidade do ambiente</span><span class="v" id="dCap">—</span>
-                        </div>
-                        <div class="detail-row"><span class="k">Ponto de acesso</span><span class="v" id="dAp">—</span></div>
-                        <div class="detail-row"><span class="k">Última atualização</span><span class="v" id="dTime">—</span>
-                        </div>
-                        <div class="insight" id="dInsight"></div>
+
+                <div class="settings-section">
+                    <h3>Conexão com a rede da escola</h3>
+                    <div class="sub">Esses campos ficam desativados até termos acesso autorizado ao sistema de Wi-Fi da
+                        EFG.
                     </div>
-                </div>
-            </div>
-        </section>
 
-        <!-- ============ CRIAR MEU MAPA ============ -->
-        <section class="screen" id="screen-editor">
-            <div class="map-card">
-                <div class="editor-toolbar">
-                    <div class="editor-hint">Clique e arraste dentro do quadro pra desenhar uma sala. Solte pra dar nome
-                        e capacidade. Cada sala criada já entra na simulação de ocupação.</div>
-                    <button class="btn-ghost" onclick="clearCustomMap()">Limpar tudo</button>
-                </div>
-
-                <div class="furniture-toolbar" id="furnitureToolbar"></div>
-
-                <div class="floor-tabs" id="floorTabsEditor"></div>
-
-                <div class="editor-canvas-outer">
-                    <div class="editor-canvas" id="editorCanvas">
-                        <div class="editor-empty-note" id="editorEmptyNote">Arraste aqui pra desenhar sua primeira sala
-                            🏫</div>
-                        <div class="draft-rect" id="draftRect"></div>
+                    <div class="field-row">
+                        <label>Endereço do controlador / roteador central</label>
+                        <input type="text" placeholder="ex: 192.168.0.1 ou painel.efg.local" disabled>
+                    </div>
+                    <div class="field-row">
+                        <label>Usuário de leitura (somente consulta)</label>
+                        <input type="text" placeholder="fornecido pelo TI da escola" disabled>
+                    </div>
+                    <div class="field-row">
+                        <label>Chave de API / Token</label>
+                        <input type="password" placeholder="••••••••••••" disabled>
+                    </div>
+                    <div class="field-note">Assim que a escola liberar o acesso, esses campos são preenchidos e a fonte
+                        de
+                        dados muda de "simulado" pra "Wi-Fi real" — o resto do app continua funcionando exatamente
+                        igual.
                     </div>
                 </div>
 
-                <div class="editor-room-list" id="editorRoomList"></div>
-
-                <div class="editor-actions">
-                    <button class="btn-primary" onclick="saveCustomMap()">Salvar meu mapa</button>
-                    <button class="btn-primary" style="background: var(--brand-blue);" onclick="publishMap()">Publicar no mapa ao vivo</button>
-                    <span class="save-status" id="saveStatus"></span>
+                <div class="settings-section">
+                    <h3>Meus dados</h3>
+                    <div class="sub">O mapa que você desenha em "Criar meu mapa" fica salvo só neste dispositivo/conta.
+                    </div>
+                    <button class="btn-ghost"
+                        onclick="clearCustomMap(); document.getElementById('saveStatus').textContent='';">Apagar meu
+                        mapa
+                        salvo</button>
+                    <button class="btn-ghost" onclick="logout()" style="margin-left:8px;">Sair da conta</button>
                 </div>
-            </div>
-        </section>
 
-        <!-- ============ CONFIGURAÇÕES ============ -->
-        <section class="screen" id="screen-settings">
-            <div class="settings-section">
-                <h3>Fonte de dados</h3>
-                <div class="sub">De onde vêm os números de ocupação mostrados no mapa.</div>
-
-                <div class="source-option selected">
-                    <div class="source-radio"></div>
-                    <div>
-                        <div class="t">Dados simulados (ativo)</div>
-                        <div class="d">Os números que você vê agora são gerados automaticamente pra testar o app, sem
-                            depender da rede da escola.</div>
+                <div class="settings-section">
+                    <h3>Sobre o projeto</h3>
+                    <div class="about-text">
+                        Sistema Inteligente de Mapeamento e Ocupação de Ambientes Escolares em Tempo Real — desenvolvido
+                        como projeto na EFG Sarah Luisa Lemos Kunirtschek de Oliveira. Versão de protótipo, dados de
+                        ocupação simulados até a integração com a infraestrutura de Wi-Fi da escola ser autorizada.
                     </div>
                 </div>
+            </section>
 
-                <div class="source-option disabled">
-                    <div class="source-radio"></div>
-                    <div>
-                        <div class="t">Wi-Fi real da EFG <span class="lock-tag">🔒 em breve</span></div>
-                        <div class="d">Vai usar os pontos de acesso da escola pra contar dispositivos por ambiente de
-                            verdade. Depende de autorização do TI/coordenação.</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="settings-section">
-                <h3>Conexão com a rede da escola</h3>
-                <div class="sub">Esses campos ficam desativados até termos acesso autorizado ao sistema de Wi-Fi da EFG.
-                </div>
-
-                <div class="field-row">
-                    <label>Endereço do controlador / roteador central</label>
-                    <input type="text" placeholder="ex: 192.168.0.1 ou painel.efg.local" disabled>
-                </div>
-                <div class="field-row">
-                    <label>Usuário de leitura (somente consulta)</label>
-                    <input type="text" placeholder="fornecido pelo TI da escola" disabled>
-                </div>
-                <div class="field-row">
-                    <label>Chave de API / Token</label>
-                    <input type="password" placeholder="••••••••••••" disabled>
-                </div>
-                <div class="field-note">Assim que a escola liberar o acesso, esses campos são preenchidos e a fonte de
-                    dados muda de "simulado" pra "Wi-Fi real" — o resto do app continua funcionando exatamente igual.
-                </div>
-            </div>
-
-            <div class="settings-section">
-                <h3>Meus dados</h3>
-                <div class="sub">O mapa que você desenha em "Criar meu mapa" fica salvo só neste dispositivo/conta.
-                </div>
-                <button class="btn-ghost"
-                    onclick="clearCustomMap(); document.getElementById('saveStatus').textContent='';">Apagar meu mapa
-                    salvo</button>
-                <button class="btn-ghost" onclick="logout()" style="margin-left:8px;">Sair da conta</button>
-            </div>
-
-            <div class="settings-section">
-                <h3>Sobre o projeto</h3>
-                <div class="about-text">
-                    Sistema Inteligente de Mapeamento e Ocupação de Ambientes Escolares em Tempo Real — desenvolvido
-                    como projeto na EFG Sarah Luisa Lemos Kunirtschek de Oliveira. Versão de protótipo, dados de
-                    ocupação simulados até a integração com a infraestrutura de Wi-Fi da escola ser autorizada.
-                </div>
-            </div>
-        </section>
-
-        <footer class="app-footer">DADOS SIMULADOS PARA FINS DE PROTÓTIPO · NENHUM DISPOSITIVO REAL FOI RASTREADO
-        </footer>
-    </div>
-
-    <div class="modal-overlay" id="modalOverlay">
-        <div class="room-form-card">
-            <label>Tipo de área
-                <select id="rfType">
-                    <option value="room">Sala / Ambiente</option>
-                    <option value="corridor">Corredor / Passagem</option>
-                </select>
-            </label>
-            <h4>Nova sala</h4>
-            <label>Nome da sala
-                <input id="rfName" type="text" placeholder="Ex: Sala 03">
-            </label>
-        <div id="rfRoomFields">
-            <label>Capacidade (nº de pessoas)
-                <input id="rfCap" type="number" value="30" min="1" max="200">
-            </label>
-            <label>Ponto de acesso Wi-Fi (opcional)
-                <input id="rfAp" type="text" placeholder="Ex: AP-05">
-            </label>
+            <footer class="app-footer">DADOS SIMULADOS PARA FINS DE PROTÓTIPO · NENHUM DISPOSITIVO REAL FOI RASTREADO
+            </footer>
         </div>
-            <label>Formato
-                <select id="rfShape" onchange="toggleShapeFields()">
-                    <option value="rect">Retângulo</option>
-                    <option value="l">Formato em L</option>
-                </select>
-            </label>
-            <div id="rfRadiusRow" style="margin-bottom:14px;">
-                <label style="margin-bottom:6px;">Cantos arredondados</label>
-                <input type="range" id="rfRadius" min="0" max="30" value="6" style="width:100%;">
-            </div>
-            <div id="rfLFields" style="display:none;">
-                <label>Canto cortado
-                    <select id="rfCorner">
-                        <option value="br">Inferior direito</option>
-                        <option value="bl">Inferior esquerdo</option>
-                        <option value="tr">Superior direito</option>
-                        <option value="tl">Superior esquerdo</option>
+
+        <div class="modal-overlay" id="modalOverlay">
+            <div class="room-form-card">
+                <label>Tipo de área
+                    <select id="rfType" onchange="toggleRoomTypeFields()">
+                        <option value="room">Sala / Ambiente</option>
+                        <option value="corridor">Corredor / Passagem</option>
                     </select>
                 </label>
-                <div style="margin-bottom:14px;">
-                    <label style="margin-bottom:6px;">Tamanho do corte</label>
-                    <input type="range" id="rfNotch" min="15" max="60" value="35" style="width:100%;">
+                <h4>Nova sala</h4>
+                <label>Nome da sala
+                    <input id="rfName" type="text" placeholder="Ex: Sala 03">
+                </label>
+                <div id="rfRoomFields">
+                    <label>Capacidade (nº de pessoas)
+                        <input id="rfCap" type="number" value="30" min="1" max="200">
+                    </label>
+                    <label>Ponto de acesso Wi-Fi (opcional)
+                        <input id="rfAp" type="text" placeholder="Ex: AP-05">
+                    </label>
+                </div>
+                <label>Formato
+                    <select id="rfShape" onchange="toggleShapeFields()">
+                        <option value="rect">Retângulo</option>
+                        <option value="l">Formato em L</option>
+                    </select>
+                </label>
+                <div id="rfRadiusRow" style="margin-bottom:14px;">
+                    <label style="margin-bottom:6px;">Cantos arredondados</label>
+                    <input type="range" id="rfRadius" min="0" max="30" value="6" style="width:100%;">
+                </div>
+                <div id="rfLFields" style="display:none;">
+                    <label>Canto cortado
+                        <select id="rfCorner">
+                            <option value="br">Inferior direito</option>
+                            <option value="bl">Inferior esquerdo</option>
+                            <option value="tr">Superior direito</option>
+                            <option value="tl">Superior esquerdo</option>
+                        </select>
+                    </label>
+                    <div style="margin-bottom:14px;">
+                        <label style="margin-bottom:6px;">Tamanho do corte</label>
+                        <input type="range" id="rfNotch" min="15" max="60" value="35" style="width:100%;">
+                    </div>
+                </div>
+                <div class="room-form-actions">
+                    <button class="btn-ghost" onclick="cancelRoomForm()">Cancelar</button>
+                    <button class="btn-primary" onclick="confirmRoomForm()">Adicionar sala</button>
                 </div>
             </div>
-            <div class="room-form-actions">
-                <button class="btn-ghost" onclick="cancelRoomForm()">Cancelar</button>
-                <button class="btn-primary" onclick="confirmRoomForm()">Adicionar sala</button>
-            </div>
         </div>
-</div>  
-    </div>
 
-    <nav class="bottom-nav">
-        <button class="nav-btn active" data-screen="home" onclick="showScreen('home')"><span
-                class="ic">🏠</span>Início</button>
-        <button class="nav-btn" data-screen="map" onclick="showScreen('map')"><span class="ic">🗺️</span>Mapa</button>
-        <button class="nav-btn" data-screen="editor" onclick="showScreen('editor')"><span
-                class="ic">✏️</span>Criar</button>
-        <button class="nav-btn" data-screen="settings" onclick="showScreen('settings')"><span
-                class="ic">⚙️</span>Config</button>
-    </nav>
+        <nav class="bottom-nav">
+            <button class="nav-btn active" data-screen="home" onclick="showScreen('home')"><span
+                    class="ic">🏠</span>Início</button>
+            <button class="nav-btn" data-screen="map" onclick="showScreen('map')"><span
+                    class="ic">🗺️</span>Mapa</button>
+            <button class="nav-btn" data-screen="editor" onclick="showScreen('editor')"><span
+                    class="ic">✏️</span>Criar</button>
+            <button class="nav-btn" data-screen="settings" onclick="showScreen('settings')"><span
+                    class="ic">⚙️</span>Config</button>
+        </nav>
     </div>
     <script src="js/script.js?v=2"></script>
 </body>
