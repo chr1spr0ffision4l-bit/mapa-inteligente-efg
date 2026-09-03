@@ -1288,11 +1288,28 @@ footer.app-footer {
 
 .floor-tabs {
     display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
+    gap: 6px;
     margin-bottom: 14px;
 }
 
+.floor-tab,
+.live-floor-tab {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: 12.5px;
+    color: var(--text-dim);
+    background: transparent;
+    border: 1px solid var(--line);
+    padding: 8px 14px;
+    border-radius: 9px;
+    cursor: pointer;
+}
+
+.floor-tab.active,
+.live-floor-tab.active {
+    border-color: var(--ap);
+    color: var(--ap);
+}
 .floor-tab-btn {
     font-family: 'Space Grotesk', sans-serif;
     font-size: 12px;
