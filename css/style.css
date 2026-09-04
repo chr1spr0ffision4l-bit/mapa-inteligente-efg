@@ -1330,3 +1330,15 @@ footer.app-footer {
 .room.kind-corridor .room-name {
     color: var(--text-dim);
 }
+
+.status-pill-top.mode-real {
+    background: rgba(26, 155, 122, .12);
+    color: var(--good);
+    border-color: rgba(26, 155, 122, .3);
+}
+
+.status-pill-top.mode-error {
+    background: rgba(224, 67, 90, .12);
+    color: var(--bad);
+    border-color: rgba(224, 67, 90, .3);
+}

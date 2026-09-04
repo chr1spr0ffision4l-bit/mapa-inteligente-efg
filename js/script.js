@@ -26,6 +26,7 @@ function enterApp(){
   loadCustomMap();
   renderLiveCustomMap();
   loadWifiConfig();
+  updateDataSourceStatus();
 }
 
 function logout(){
@@ -116,15 +117,18 @@ function insightFor(r, status){
   if(status === "warn") return "🟡 <b>"+r.name+"</b> está com ocupação elevada. Vale acompanhar nos próximos minutos.";
   return "🟢 <b>"+r.name+"</b> está com ocupação dentro do esperado para este horário.";
 }
-function customRoomTickOne(r){
-  const delta = Math.floor(Math.random()*5) - 2;
-  r.count = Math.max(0, Math.min(r.cap + 2, r.count + delta));
+function applyRoomVisuals(r){
   const status = statusFor(r.count, r.cap);
   r.els.root.dataset.status = status;
   r.els.pill.textContent = statusLabel(status);
   r.els.count.innerHTML = r.count + "<small>/"+r.cap+"</small>";
   r.els.bar.style.width = Math.min(100, (r.count/r.cap*100)) + "%";
   syncDotsFor(r.els.layer, r.count, capVisualFor(r.cap), r.dotsArr);
+}
+function customRoomTickOne(r){
+  const delta = Math.floor(Math.random()*5) - 2;
+  r.count = Math.max(0, Math.min(r.cap + 2, r.count + delta));
+  applyRoomVisuals(r);
 }
 
 /* ================= MOBÍLIA DAS SALAS ================= */
@@ -676,9 +680,21 @@ function renderHomeStats(){
 /* ================= CLOCK + LOOP ================= */
 function updateClock(){ document.getElementById("clock").textContent = new Date().toLocaleTimeString("pt-BR"); }
 
-function tick(){
-  customRooms.forEach(customRoomTickOne);
-  liveRooms.forEach(customRoomTickOne);
+async function tick(){
+  customRooms.forEach(customRoomTickOne); // o editor ("Criar meu mapa") sempre simula, é só uma prévia de layout
+
+  await updateDataSourceStatus();
+
+  if(dataSourceMode === "real" && window.__realOccupancyData){
+    liveRooms.forEach(r => {
+      const real = window.__realOccupancyData[r.ap];
+      if(real != null){ r.count = real; applyRoomVisuals(r); }
+      else { customRoomTickOne(r); } // sala com AP que ainda não veio nos dados reais: continua simulando só ela
+    });
+  } else {
+    liveRooms.forEach(customRoomTickOne);
+  }
+
   if(window.__selectedLive) showLiveDetail(window.__selectedLive);
   renderHomeStats();
 }
@@ -748,6 +764,7 @@ function saveWifiConfig(){
   };
   localStorage.setItem(wifiStorageKey(), JSON.stringify(cfg));
   loadWifiConfig();
+  updateDataSourceStatus();
 }
 
 function unlockWifiConfig(){
@@ -756,18 +773,72 @@ function unlockWifiConfig(){
   try{ const raw = localStorage.getItem(wifiStorageKey()); cfg = raw ? JSON.parse(raw) : null; }catch(e){ cfg = null; }
   if(cfg){ cfg.locked = false; localStorage.setItem(wifiStorageKey(), JSON.stringify(cfg)); }
   loadWifiConfig();
+  updateDataSourceStatus();
 }
 
-/* Gancho pronto pra quando a EFG liberar o acesso de verdade.
-   Ainda não é chamado em lugar nenhum — o app continua 100% simulado até você ligar isso. */
+function hasRealWifiConfig(){
+  let cfg = null;
+  try{ const raw = localStorage.getItem(wifiStorageKey()); cfg = raw ? JSON.parse(raw) : null; }catch(e){ cfg = null; }
+  return !!(cfg && cfg.locked && cfg.address && cfg.user && cfg.apiKey);
+}
+
+
+/* ================= FONTE DE DADOS (real quando configurado, simulado como reserva) ================= */
+let dataSourceMode = "simulado"; // "simulado" | "real" | "erro"
+
 async function fetchRealOccupancyData(){
-  const raw = localStorage.getItem(wifiStorageKey());
-  if(!raw) return null;
-  const cfg = JSON.parse(raw);
-  // TODO: quando tiver acesso real, troca isso por uma chamada de verdade, por exemplo:
-  // const res = await fetch(`http://${cfg.address}/api/clientes`, { headers: { Authorization: cfg.apiKey } });
-  // return await res.json();
-  return null;
+  let cfg = null;
+  try{ const raw = localStorage.getItem(wifiStorageKey()); cfg = raw ? JSON.parse(raw) : null; }catch(e){ cfg = null; }
+  if(!cfg || !cfg.locked || !cfg.address || !cfg.user || !cfg.apiKey) return null;
+
+  try{
+    // TODO: ajustar essa chamada pro formato real da API do controlador da EFG assim que soubermos a marca/modelo.
+    // Formato de retorno esperado: um objeto tipo { "AP-01": 12, "AP-02": 5, ... }
+    // com a quantidade de dispositivos conectados em cada ponto de acesso.
+    const res = await fetch(`http://${cfg.address}/api/clientes`, {
+      headers: { "Authorization": "Bearer " + cfg.apiKey, "X-User": cfg.user }
+    });
+    if(!res.ok) throw new Error("resposta não OK: " + res.status);
+    return await res.json();
+  }catch(err){
+    console.warn("Não foi possível buscar dados reais do Wi-Fi, usando modo simulado:", err);
+    return null;
+  }
+}
+
+async function updateDataSourceStatus(){
+  const pill = document.getElementById("dataSourcePill");
+  const banner = document.getElementById("dataBanner");
+  if(!pill) return;
+
+  if(!hasRealWifiConfig()){
+    dataSourceMode = "simulado";
+    window.__realOccupancyData = null;
+  } else {
+    const real = await fetchRealOccupancyData();
+    dataSourceMode = real ? "real" : "erro";
+    window.__realOccupancyData = real;
+  }
+
+  pill.classList.remove("mode-real", "mode-error");
+  if(dataSourceMode === "simulado"){
+    pill.textContent = "🔧 Dados simulados";
+    if(banner) banner.style.display = "";
+  } else if(dataSourceMode === "real"){
+    pill.textContent = "🟢 Wi-Fi real conectado";
+    pill.classList.add("mode-real");
+    if(banner) banner.style.display = "none";
+  } else {
+    pill.textContent = "⚠️ Wi-Fi configurado, sem conexão";
+    pill.classList.add("mode-error");
+    if(banner) banner.style.display = "";
+  }
+}
+
+function hasRealWifiConfig(){
+  let cfg = null;
+  try{ const raw = localStorage.getItem(wifiStorageKey()); cfg = raw ? JSON.parse(raw) : null; }catch(e){ cfg = null; }
+  return !!(cfg && cfg.locked && cfg.address && cfg.user && cfg.apiKey);
 }
 
 /* ================= BOOT ================= */
