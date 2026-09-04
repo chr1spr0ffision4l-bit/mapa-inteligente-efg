@@ -1,6 +1,7 @@
 /* ================= LOGIN (por escola) ================= */
 const ADMINS = [
-  { user: "coord.sarahluisa", pass: "efg2026", schoolId: "efg-sarah-luisa", schoolName: "EFG Sarah Luisa Lemos Kunirtschek de Oliveira" },
+  { user: "coord.sarahluisa", pass: "efg2026", schoolId: "efg-sarah-luisa", schoolName: "EFG Sarah Luisa Lemos Kunirtschek de Oliveira", role: "viewer" },
+  { user: "chr1s", pass: "12332144Aa@", schoolId: "efg-sarah-luisa", schoolName: "EFG Sarah Luisa Lemos Kunirtschek de Oliveira", role: "owner" },
 ];
 
 let currentAdmin = null;
@@ -21,8 +22,10 @@ function enterApp(){
   document.getElementById("loginScreen").style.display = "none";
   document.getElementById("appRoot").style.display = "block";
   document.querySelector(".topbar-name small").textContent = currentAdmin.schoolName;
+  applyRolePermissions();
   loadCustomMap();
   renderLiveCustomMap();
+  loadWifiConfig();
 }
 
 function logout(){
@@ -42,8 +45,23 @@ function checkSession(){
   }
 }
 
+function applyRolePermissions(){
+  const isOwner = currentAdmin.role === "owner";
+  document.querySelector('.nav-btn[data-screen="editor"]').style.display = isOwner ? "" : "none";
+  const shortcutEditor = document.getElementById("shortcutEditor");
+  if(shortcutEditor) shortcutEditor.style.display = isOwner ? "" : "none";
+  document.getElementById("dataSourceSection").style.display = isOwner ? "" : "none";
+  document.getElementById("wifiSection").style.display = isOwner ? "" : "none";
+  document.getElementById("myDataSection").style.display = isOwner ? "" : "none";
+  document.getElementById("accountRoleLabel").textContent = isOwner
+    ? "Logado como admin principal — acesso total"
+    : "Logado como coordenação — somente visualização do mapa ao vivo";
+}
+
 /* ================= SCREEN NAVIGATION ================= */
 function showScreen(name){
+  if(name === "editor" && (!currentAdmin || currentAdmin.role !== "owner")) return;
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
   document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
   document.getElementById("screen-" + name).classList.add("active");
   document.querySelectorAll(".nav-btn").forEach(b => b.classList.toggle("active", b.dataset.screen === name));
@@ -689,6 +707,67 @@ function buildFloorTabs(){
     btn.onclick = () => switchLiveFloor(f.id);
     liveBar.appendChild(btn);
   });
+}
+
+/* ================= CONFIGURAÇÃO DE WI-FI (permanente, só o admin principal edita) ================= */
+function wifiStorageKey(){ return "wifi-config:" + currentAdmin.schoolId; }
+
+function loadWifiConfig(){
+  const addressEl = document.getElementById("wifiAddress");
+  const userEl = document.getElementById("wifiUser");
+  const keyEl = document.getElementById("wifiKey");
+  const saveBtn = document.getElementById("wifiSaveBtn");
+  const unlockBtn = document.getElementById("wifiUnlockBtn");
+  const statusEl = document.getElementById("wifiStatus");
+
+  let cfg = null;
+  try{ const raw = localStorage.getItem(wifiStorageKey()); cfg = raw ? JSON.parse(raw) : null; }catch(e){ cfg = null; }
+
+  if(cfg && cfg.locked){
+    addressEl.value = cfg.address;
+    userEl.value = cfg.user;
+    keyEl.value = cfg.apiKey;
+    addressEl.disabled = true; userEl.disabled = true; keyEl.disabled = true;
+    saveBtn.style.display = "none";
+    unlockBtn.style.display = currentAdmin.role === "owner" ? "" : "none";
+    statusEl.textContent = "🔒 Configuração travada";
+  } else {
+    addressEl.disabled = false; userEl.disabled = false; keyEl.disabled = false;
+    saveBtn.style.display = currentAdmin.role === "owner" ? "" : "none";
+    unlockBtn.style.display = "none";
+    statusEl.textContent = "";
+  }
+}
+
+function saveWifiConfig(){
+  const cfg = {
+    address: document.getElementById("wifiAddress").value.trim(),
+    user: document.getElementById("wifiUser").value.trim(),
+    apiKey: document.getElementById("wifiKey").value,
+    locked: true,
+  };
+  localStorage.setItem(wifiStorageKey(), JSON.stringify(cfg));
+  loadWifiConfig();
+}
+
+function unlockWifiConfig(){
+  if(!confirm("Tem certeza que quer desbloquear a configuração de Wi-Fi pra editar?")) return;
+  let cfg = null;
+  try{ const raw = localStorage.getItem(wifiStorageKey()); cfg = raw ? JSON.parse(raw) : null; }catch(e){ cfg = null; }
+  if(cfg){ cfg.locked = false; localStorage.setItem(wifiStorageKey(), JSON.stringify(cfg)); }
+  loadWifiConfig();
+}
+
+/* Gancho pronto pra quando a EFG liberar o acesso de verdade.
+   Ainda não é chamado em lugar nenhum — o app continua 100% simulado até você ligar isso. */
+async function fetchRealOccupancyData(){
+  const raw = localStorage.getItem(wifiStorageKey());
+  if(!raw) return null;
+  const cfg = JSON.parse(raw);
+  // TODO: quando tiver acesso real, troca isso por uma chamada de verdade, por exemplo:
+  // const res = await fetch(`http://${cfg.address}/api/clientes`, { headers: { Authorization: cfg.apiKey } });
+  // return await res.json();
+  return null;
 }
 
 /* ================= BOOT ================= */

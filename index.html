@@ -82,7 +82,7 @@
                         <div class="t">Ver mapa ao vivo</div>
                         <div class="d">Ocupação de cada sala, laboratório e biblioteca em tempo real</div>
                     </button>
-                    <button class="shortcut-card" onclick="showScreen('editor')">
+                    <button class="shortcut-card" id="shortcutEditor" onclick="showScreen('editor')">
                         <div class="ic">✏️</div>
                         <div class="t">Criar meu mapa</div>
                         <div class="d">Desenhe suas próprias salas e veja a simulação rodando nelas</div>
@@ -180,7 +180,7 @@
 
             <!-- ============ CONFIGURAÇÕES ============ -->
             <section class="screen" id="screen-settings">
-                <div class="settings-section">
+                <div class="settings-section" id="dataSourceSection">
                     <h3>Fonte de dados</h3>
                     <div class="sub">De onde vêm os números de ocupação mostrados no mapa.</div>
 
@@ -205,32 +205,34 @@
                     </div>
                 </div>
 
-                <div class="settings-section">
-                    <h3>Conexão com a rede da escola</h3>
-                    <div class="sub">Esses campos ficam desativados até termos acesso autorizado ao sistema de Wi-Fi da
-                        EFG.
-                    </div>
+<div class="settings-section" id="wifiSection">
+    <h3>Conexão com a rede da escola</h3>
+    <div class="sub">Depois de salvar, essa configuração fica travada — só o admin principal pode alterar.</div>
 
-                    <div class="field-row">
-                        <label>Endereço do controlador / roteador central</label>
-                        <input type="text" placeholder="ex: 192.168.0.1 ou painel.efg.local" disabled>
-                    </div>
-                    <div class="field-row">
-                        <label>Usuário de leitura (somente consulta)</label>
-                        <input type="text" placeholder="fornecido pelo TI da escola" disabled>
-                    </div>
-                    <div class="field-row">
-                        <label>Chave de API / Token</label>
-                        <input type="password" placeholder="••••••••••••" disabled>
-                    </div>
-                    <div class="field-note">Assim que a escola liberar o acesso, esses campos são preenchidos e a fonte
-                        de
-                        dados muda de "simulado" pra "Wi-Fi real" — o resto do app continua funcionando exatamente
-                        igual.
-                    </div>
-                </div>
+    <div class="field-row">
+        <label>Endereço do controlador / roteador central</label>
+        <input type="text" id="wifiAddress" placeholder="ex: 192.168.0.1 ou painel.efg.local">
+    </div>
+    <div class="field-row">
+        <label>Usuário de leitura (somente consulta)</label>
+        <input type="text" id="wifiUser" placeholder="fornecido pelo TI da escola">
+    </div>
+    <div class="field-row">
+        <label>Chave de API / Token</label>
+        <input type="password" id="wifiKey" placeholder="••••••••••••">
+    </div>
+    <div class="field-note">Assim que a escola liberar o acesso, esses campos são preenchidos e a fonte de dados muda de
+        "simulado" pra "Wi-Fi real" — o resto do app continua funcionando exatamente igual.</div>
 
-                <div class="settings-section">
+    <div class="editor-actions" style="margin-top:14px;">
+        <button class="btn-primary" id="wifiSaveBtn" onclick="saveWifiConfig()">Salvar e travar</button>
+        <button class="btn-ghost" id="wifiUnlockBtn" onclick="unlockWifiConfig()" style="display:none;">Desbloquear pra
+            editar</button>
+        <span class="save-status" id="wifiStatus"></span>
+    </div>
+</div>
+
+                <div class="settings-section" id="myDataSection">
                     <h3>Meus dados</h3>
                     <div class="sub">O mapa que você desenha em "Criar meu mapa" fica salvo só neste dispositivo/conta.
                     </div>
@@ -242,16 +244,22 @@
                 </div>
 
                 <div class="settings-section">
+                    <h3>Sua conta</h3>
+                    <div class="sub" id="accountRoleLabel">—</div>
+                    <button class="btn-ghost" onclick="logout()">Sair da conta</button>
+                </div>
+
+                <div class="settings-section">
                     <h3>Sobre o projeto</h3>
                     <div class="about-text">
                         Sistema Inteligente de Mapeamento e Ocupação de Ambientes Escolares em Tempo Real — desenvolvido
-                        como projeto na EFG Sarah Luisa Lemos Kunirtschek de Oliveira. Versão de protótipo, dados de
+                        como projeto na EFG Sarah Luisa Lemos Kunirtschek de Oliveira por <b>CHRISTIAN GABRIEL PESSOA SILVA</b>. Versão de protótipo, dados de
                         ocupação simulados até a integração com a infraestrutura de Wi-Fi da escola ser autorizada.
                     </div>
                 </div>
             </section>
 
-            <footer class="app-footer">DADOS SIMULADOS PARA FINS DE PROTÓTIPO · NENHUM DISPOSITIVO REAL FOI RASTREADO
+            <footer class="app-footer">DADOS SIMULADOS PARA FINS DE PROTÓTIPO · NENHUM DISPOSITIVO REAL FOI RASTREADO <br> Desenvolvido por CHRISTIAN GABRIEL PESSOA SILVA
             </footer>
         </div>
 
